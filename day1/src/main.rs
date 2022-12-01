@@ -77,8 +77,7 @@ const fn get_top3_elfs() -> [u32; 3] {
         } else if max[1] < elves[index] {
             max[2] = max[1];
             max[1] = elves[index];
-        }
-        if max[2] < elves[index] {
+        } else if max[2] < elves[index] {
             max[2] = elves[index];
         }
         index += 1;
@@ -99,8 +98,7 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    #[test]
-    fn is_correct() {
+    fn get_elves() -> Vec<u32> {
         let s = include_str!("../input");
         let elves = s.lines().fold(vec![0], |mut elves, s| {
             if s.is_empty() {
@@ -111,6 +109,26 @@ mod tests {
             }
             elves
         });
-        assert_eq!(elves, super::get_elves());
+        elves
+    }
+
+    #[test]
+    fn elves() {
+        assert_eq!(get_elves(), super::get_elves());
+    }
+
+    #[test]
+    fn top1() {
+        assert_eq!(get_elves().into_iter().max().unwrap(), super::get_max_elf());
+    }
+
+    #[test]
+    fn top3() {
+        let mut elves = get_elves();
+        elves.sort_unstable();
+        assert_eq!(
+            elves.into_iter().rev().take(3).collect::<Vec<_>>(),
+            super::get_top3_elfs()
+        );
     }
 }
