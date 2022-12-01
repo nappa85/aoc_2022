@@ -1,4 +1,9 @@
 const INPUT: &[u8] = include_bytes!("../input");
+const COUNT: usize = get_elves_count();
+const ELVES: [u32; COUNT] = get_elves();
+const TOP1: u32 = get_max_elf();
+const TOP3: [u32; 3] = get_top3_elfs();
+const TOP3_SUM: u32 = sum_top3_elfs();
 
 const fn get_elves_count() -> usize {
     let mut index = 0;
@@ -30,12 +35,12 @@ const fn calc_value(val: [Option<u8>; 10]) -> u32 {
     tot
 }
 
-const fn get_elves() -> [u32; get_elves_count()] {
+const fn get_elves() -> [u32; COUNT] {
     let mut index = 0;
     let mut current_elf = 0;
     let mut current = [None; 10];
     let mut current_index = 0;
-    let mut elves = [0; get_elves_count()];
+    let mut elves = [0; COUNT];
     while index < INPUT.len() {
         if INPUT[index] == 10 && index > 0 && INPUT[index - 1] == 10 {
             current_elf += 1;
@@ -55,10 +60,9 @@ const fn get_elves() -> [u32; get_elves_count()] {
 const fn get_max_elf() -> u32 {
     let mut max = 0;
     let mut index = 0;
-    let elves = get_elves();
-    while index < elves.len() {
-        if max < elves[index] {
-            max = elves[index];
+    while index < ELVES.len() {
+        if max < ELVES[index] {
+            max = ELVES[index];
         }
         index += 1;
     }
@@ -68,17 +72,16 @@ const fn get_max_elf() -> u32 {
 const fn get_top3_elfs() -> [u32; 3] {
     let mut max = [0; 3];
     let mut index = 0;
-    let elves = get_elves();
-    while index < elves.len() {
-        if max[0] < elves[index] {
+    while index < ELVES.len() {
+        if max[0] < ELVES[index] {
             max[2] = max[1];
             max[1] = max[0];
-            max[0] = elves[index];
-        } else if max[1] < elves[index] {
+            max[0] = ELVES[index];
+        } else if max[1] < ELVES[index] {
             max[2] = max[1];
-            max[1] = elves[index];
-        } else if max[2] < elves[index] {
-            max[2] = elves[index];
+            max[1] = ELVES[index];
+        } else if max[2] < ELVES[index] {
+            max[2] = ELVES[index];
         }
         index += 1;
     }
@@ -91,9 +94,9 @@ const fn sum_top3_elfs() -> u32 {
 }
 
 fn main() {
-    println!("Max elf has {} calories", get_max_elf());
-    println!("Top 3 elf: {:#?}", get_top3_elfs());
-    println!("Sum top 3 elf: {:#?} calories", sum_top3_elfs());
+    println!("Max elf has {TOP1} calories");
+    println!("Top 3 elf: {TOP3:#?}");
+    println!("Sum top 3 elf: {TOP3_SUM} calories");
 }
 
 #[cfg(test)]
@@ -114,12 +117,12 @@ mod tests {
 
     #[test]
     fn elves() {
-        assert_eq!(get_elves(), super::get_elves());
+        assert_eq!(get_elves(), super::ELVES);
     }
 
     #[test]
     fn top1() {
-        assert_eq!(get_elves().into_iter().max().unwrap(), super::get_max_elf());
+        assert_eq!(get_elves().into_iter().max().unwrap(), super::TOP1);
     }
 
     #[test]
@@ -128,7 +131,7 @@ mod tests {
         elves.sort_unstable();
         assert_eq!(
             elves.into_iter().rev().take(3).collect::<Vec<_>>(),
-            super::get_top3_elfs()
+            super::TOP3
         );
     }
 }
