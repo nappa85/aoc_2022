@@ -116,11 +116,41 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
+    use std::ops::Add;
+
+    impl From<u8> for super::Elf {
+        fn from(b: u8) -> Self {
+            super::Elf::new(b)
+        }
+    }
+    impl From<u8> for super::Mine {
+        fn from(b: u8) -> Self {
+            super::Mine::new(b)
+        }
+    }
+    impl From<u8> for super::Outcome {
+        fn from(b: u8) -> Self {
+            super::Outcome::new(b)
+        }
+    }
+    impl Add<super::Mine> for super::Elf {
+        type Output = u8;
+        fn add(self, rhs: super::Mine) -> Self::Output {
+            self.add_mine(rhs)
+        }
+    }
+    impl Add<super::Outcome> for super::Elf {
+        type Output = u8;
+        fn add(self, rhs: super::Outcome) -> Self::Output {
+            self.add_outcome(rhs)
+        }
+    }
+
     #[test]
     fn first() {
         let sum = include_bytes!("../input")
             .chunks(4)
-            .map(|s| super::Elf::new(s[0]).add_mine(super::Mine::new(s[2])) as u16)
+            .map(|s| (super::Elf::from(s[0]) + super::Mine::from(s[2])) as u16)
             .sum::<u16>();
         assert_eq!(sum, super::SUM_AS_MINE); //13009
     }
@@ -128,8 +158,8 @@ mod tests {
     fn second() {
         let sum = include_bytes!("../input")
             .chunks(4)
-            .map(|s| super::Elf::new(s[0]).add_outcome(super::Outcome::new(s[2])) as u16)
+            .map(|s| (super::Elf::from(s[0]) + super::Outcome::from(s[2])) as u16)
             .sum::<u16>();
-        assert_eq!(sum, super::SUM_AS_OUTCOME); //13009
+        assert_eq!(sum, super::SUM_AS_OUTCOME); //10398
     }
 }
