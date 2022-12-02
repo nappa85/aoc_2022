@@ -45,13 +45,13 @@ impl Elf {
             + match (self, rhs) {
                 (Elf::Rock, Mine::Rock)
                 | (Elf::Paper, Mine::Paper)
-                | (Elf::Scissor, Mine::Scissor) => 3, //draw
+                | (Elf::Scissor, Mine::Scissor) => Outcome::Draw as u8,
                 (Elf::Rock, Mine::Paper)
                 | (Elf::Paper, Mine::Scissor)
-                | (Elf::Scissor, Mine::Rock) => 6, //win
+                | (Elf::Scissor, Mine::Rock) => Outcome::Win as u8,
                 (Elf::Paper, Mine::Rock)
                 | (Elf::Scissor, Mine::Paper)
-                | (Elf::Rock, Mine::Scissor) => 0, //lose
+                | (Elf::Rock, Mine::Scissor) => Outcome::Lose as u8,
             }
     }
 
