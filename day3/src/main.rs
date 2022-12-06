@@ -63,13 +63,15 @@ const fn second() -> u16 {
         'top: while i < LINES[l].1 {
             let mut j = LINES[l + 1].0;
             while j < LINES[l + 1].1 {
-                let mut z = LINES[l + 2].0;
-                while z < LINES[l + 2].1 {
-                    if INPUT[i] == INPUT[j] && INPUT[i] == INPUT[z] {
-                        o += to_priority(INPUT[i]);
-                        break 'top;
+                if INPUT[i] == INPUT[j] {
+                    let mut z = LINES[l + 2].0;
+                    while z < LINES[l + 2].1 {
+                        if INPUT[i] == INPUT[z] {
+                            o += to_priority(INPUT[i]);
+                            break 'top;
+                        }
+                        z += 1;
                     }
-                    z += 1;
                 }
                 j += 1;
             }
