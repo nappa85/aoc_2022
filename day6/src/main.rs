@@ -36,7 +36,7 @@ fn main() {
 #[cfg(test)]
 mod tests {
     fn is_unique(bytes: &[u8]) -> bool {
-        for i in 0..bytes.len() {
+        for i in 0..(bytes.len() - 1) {
             for j in (i + 1)..bytes.len() {
                 if bytes[i] == bytes[j] {
                     return false;
