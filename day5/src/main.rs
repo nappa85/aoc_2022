@@ -179,8 +179,8 @@ const fn get_first_empty(c: &[Option<char>]) -> usize {
 }
 
 fn main() {
-    println!("contained {FIRST:?}");
-    println!("overlapping {SECOND:?}");
+    println!("first {FIRST:?}");
+    println!("second {SECOND:?}");
 }
 
 #[cfg(test)]
