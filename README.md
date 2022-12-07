@@ -8,3 +8,4 @@
 | 4 | Improved difficulty using only const-eval code |
 | 5 | Improved difficulty using only const-eval code |
 | 6 | Improved difficulty using only const-eval code |
+| 7 | I've done the bare minimum... |
