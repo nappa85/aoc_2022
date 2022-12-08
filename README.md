@@ -9,3 +9,4 @@
 | 5 | Improved difficulty using only const-eval code |
 | 6 | Improved difficulty using only const-eval code |
 | 7 | Improved difficulty using only const-eval code |
+| 8 | Bare minimum... |
