@@ -1,24 +1,25 @@
-#![feature(const_eval_limit)]
-#![const_eval_limit = "2000000"]
+// #![feature(const_eval_limit)]
+// #![const_eval_limit = "2000000"]
 
 const INPUT: &[u8] = include_bytes!("../input");
-const NUM_ROWS: usize = get_num_rows();
+// const NUM_ROWS: usize = get_num_rows();
 const NUM_COLS: usize = get_num_cols();
+const NUM_ROWS: usize = INPUT.len() / NUM_COLS;
 const TREES: [[u8; NUM_COLS]; NUM_ROWS] = get_trees();
 const FIRST: u16 = first();
 const SECOND: u32 = second();
 
-const fn get_num_rows() -> usize {
-    let mut i = 0;
-    let mut o = 0;
-    while i < INPUT.len() {
-        if INPUT[i] == b'\n' {
-            o += 1;
-        }
-        i += 1;
-    }
-    o
-}
+// const fn get_num_rows() -> usize {
+//     let mut i = 0;
+//     let mut o = 0;
+//     while i < INPUT.len() {
+//         if INPUT[i] == b'\n' {
+//             o += 1;
+//         }
+//         i += 1;
+//     }
+//     o
+// }
 
 const fn get_num_cols() -> usize {
     let mut i = 0;

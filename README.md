@@ -10,3 +10,4 @@
 | 6 | Improved difficulty using only const-eval code |
 | 7 | Improved difficulty using only const-eval code |
 | 8 | Improved difficulty using only const-eval code, had to use nightly to increment const_eval_limit |
+| 9 | Bare minimum... |
