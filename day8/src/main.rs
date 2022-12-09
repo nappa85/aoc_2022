@@ -1,5 +1,5 @@
-// #![feature(const_eval_limit)]
-// #![const_eval_limit = "2000000"]
+#![feature(const_eval_limit)]
+#![const_eval_limit = "2000000"]
 
 const INPUT: &[u8] = include_bytes!("../input");
 // const NUM_ROWS: usize = get_num_rows();
