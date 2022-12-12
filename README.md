@@ -13,3 +13,4 @@
 | 9 | Improved difficulty using only const-eval code, had to use nightly to increment const_eval_limit, takes several minutes to compile |
 | 10 | Wasn't at home, didn't had my PC, made it on the fly the playground |
 | 11 | Wasn't at home, didn't had my PC, made it on the fly the playground |
+| 12 | Bare minimum... |
