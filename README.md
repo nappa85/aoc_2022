@@ -14,3 +14,4 @@
 | 10 | Wasn't at home, didn't had my PC, made it on the fly the playground |
 | 11 | Wasn't at home, didn't had my PC, made it on the fly the playground |
 | 12 | Bare minimum... |
+| 13 | Bare minimum, and for the first time I've used an external crate (serde) |
