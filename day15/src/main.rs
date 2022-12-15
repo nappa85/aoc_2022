@@ -41,38 +41,15 @@ fn main() {
             (sx, sy, bx, by)
         })
         .collect::<Vec<_>>();
-    let min_x = coords
-        .iter()
-        .map(|(sx, sy, bx, by)| {
+    let (min_x, min_y, _max_x, _max_y) =
+        coords.iter().fold((0, 0, 0, 0), |mut a, (sx, sy, bx, by)| {
             let bow = (sx - bx).abs() + (sy - by).abs();
-            *sx - bow
-        })
-        .min()
-        .unwrap();
-    let min_y = coords
-        .iter()
-        .map(|(sx, sy, bx, by)| {
-            let bow = (sx - bx).abs() + (sy - by).abs();
-            *sy - bow
-        })
-        .min()
-        .unwrap();
-    let _max_x = coords
-        .iter()
-        .map(|(sx, sy, bx, by)| {
-            let bow = (sx - bx).abs() + (sy - by).abs();
-            *sx + bow
-        })
-        .max()
-        .unwrap();
-    let _max_y = coords
-        .iter()
-        .map(|(sx, sy, bx, by)| {
-            let bow = (sx - bx).abs() + (sy - by).abs();
-            *sy + bow
-        })
-        .max()
-        .unwrap();
+            a.0 = a.0.min(*sx - bow);
+            a.1 = a.1.min(*sy - bow);
+            a.2 = a.2.max(*sx + bow);
+            a.3 = a.3.max(*sy + bow);
+            a
+        });
     // let mut grid = vec![
     //     vec![Things::None; usize::try_from(max_y - min_y).unwrap() + 1];
     //     usize::try_from(max_x - min_x).unwrap() + 1
@@ -132,10 +109,13 @@ fn main() {
         .count();
     println!("{count}"); // 4985193
 
-    let min_x = coords.iter().map(|(sx, _, _, _)| *sx).min().unwrap();
-    let min_y = coords.iter().map(|(_, sy, _, _)| *sy).min().unwrap();
-    let max_x = coords.iter().map(|(sx, _, _, _)| *sx).max().unwrap();
-    let max_y = coords.iter().map(|(_, sy, _, _)| *sy).max().unwrap();
+    let (min_x, min_y, max_x, max_y) = coords.iter().fold((0, 0, 0, 0), |mut a, (sx, sy, _, _)| {
+        a.0 = a.0.min(*sx);
+        a.1 = a.1.min(*sy);
+        a.2 = a.2.max(*sx);
+        a.3 = a.3.max(*sy);
+        a
+    });
     coords
         .iter()
         .flat_map(|(sx, sy, bx, by)| {
