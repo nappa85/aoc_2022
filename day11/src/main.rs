@@ -1,5 +1,5 @@
 #![feature(const_eval_limit)]
-#![const_eval_limit = "70000000"]
+#![const_eval_limit = "80000000"]
 
 const INPUT: &[u8] = include_bytes!("../input");
 const NUM_MONKE: usize = get_num_monke();
@@ -36,6 +36,8 @@ enum Operation {
     Mul(u64),
     Sum(u64),
     MulSelf,
+    Div(u64),
+    Mod(u64),
 }
 
 const fn get_num_monke() -> usize {
@@ -113,10 +115,10 @@ const fn get_u64(input: [u8; 2]) -> u64 {
     }
 }
 
-const fn first() -> u64 {
+const fn get_top_monke(iterations: u32, operation: Operation) -> u64 {
     let mut monkeys = MONKE;
     let mut n = 0;
-    while n < 20 {
+    while n < iterations {
         let mut i = 0;
         while i < NUM_MONKE {
             let temp = monkeys[i].items;
@@ -128,7 +130,13 @@ const fn first() -> u64 {
                         Operation::Sum(x) => worry + x,
                         Operation::Mul(x) => worry * x,
                         Operation::MulSelf => worry * worry,
-                    } / 3;
+                        _ => unreachable!(),
+                    };
+                    let worry = match operation {
+                        Operation::Div(x) => worry / x,
+                        Operation::Mod(x) => worry % x,
+                        _ => unreachable!(),
+                    };
                     let monkey = if worry % monkeys[i].test == 0 {
                         monkeys[i].positive
                     } else {
@@ -163,60 +171,18 @@ const fn first() -> u64 {
     top2[0] * top2[1]
 }
 
+const fn first() -> u64 {
+    get_top_monke(20, Operation::Div(3))
+}
+
 const fn second() -> u64 {
-    let mut monkeys = MONKE;
     let mut mcm = 1;
     let mut i = 0;
     while i < NUM_MONKE {
-        mcm *= monkeys[i].test;
+        mcm *= MONKE[i].test;
         i += 1;
     }
-    let mut n = 0;
-    while n < 10000 {
-        let mut i = 0;
-        while i < NUM_MONKE {
-            let temp = monkeys[i].items;
-            monkeys[i].items = [None; ITEMS];
-            let mut t = 0;
-            while t < temp.len() {
-                if let Some(worry) = temp[t] {
-                    let worry = match monkeys[i].operation {
-                        Operation::Sum(x) => worry + x,
-                        Operation::Mul(x) => worry * x,
-                        Operation::MulSelf => worry * worry,
-                    } % mcm;
-                    let monkey = if worry % monkeys[i].test == 0 {
-                        monkeys[i].positive
-                    } else {
-                        monkeys[i].negative
-                    };
-                    let mut n = 0;
-                    while n < ITEMS && monkeys[monkey].items[n].is_some() {
-                        n += 1;
-                    }
-                    monkeys[monkey].items[n] = Some(worry);
-                    monkeys[i].inspected += 1;
-                    t += 1;
-                } else {
-                    break;
-                }
-            }
-            i += 1;
-        }
-        n += 1;
-    }
-    let mut top2 = [0, 0];
-    let mut i = 0;
-    while i < NUM_MONKE {
-        if top2[0] < monkeys[i].inspected {
-            top2[1] = top2[0];
-            top2[0] = monkeys[i].inspected;
-        } else if top2[1] < monkeys[i].inspected {
-            top2[1] = monkeys[i].inspected;
-        }
-        i += 1;
-    }
-    top2[0] * top2[1]
+    get_top_monke(10000, Operation::Mod(mcm))
 }
 
 fn main() {
@@ -305,14 +271,15 @@ mod tests {
         }
         monkeys
     }
-    #[test]
-    fn first() {
-        let mut monkeys = get_monkeys();
-        for _ in 0..20 {
+    fn get_top_monkeys<F>(mut monkeys: Vec<Monkey>, iterations: u32, operation: F) -> u64
+    where
+        F: Fn(u64) -> u64,
+    {
+        for _ in 0..iterations {
             for i in 0..8 {
                 let temp = std::mem::take(&mut monkeys[i].items);
                 for mut worry in temp {
-                    worry = (monkeys[i].operation + worry) / 3;
+                    worry = operation(monkeys[i].operation + worry);
                     let monkey = if worry % monkeys[i].test == 0 {
                         monkeys[i].positive
                     } else {
@@ -324,28 +291,18 @@ mod tests {
             }
         }
         monkeys.sort_unstable_by(|a, b| a.inspected.cmp(&b.inspected));
-        assert_eq!(monkeys[6].inspected * monkeys[7].inspected, super::FIRST); // 110220
+        monkeys[6].inspected * monkeys[7].inspected
+    }
+    #[test]
+    fn first() {
+        let monkeys = get_monkeys();
+        assert_eq!(get_top_monkeys(monkeys, 20, |n| n / 3), super::FIRST); // 110220
     }
     #[test]
     fn second() {
-        let mut monkeys = get_monkeys();
-        for _ in 0..10000 {
-            for i in 0..8 {
-                let temp = std::mem::take(&mut monkeys[i].items);
-                for mut worry in temp {
-                    worry = (monkeys[i].operation + worry)
-                        % monkeys.iter().map(|m| m.test).product::<u64>();
-                    let monkey = if worry % monkeys[i].test == 0 {
-                        monkeys[i].positive
-                    } else {
-                        monkeys[i].negative
-                    };
-                    monkeys[monkey].items.push(worry);
-                    monkeys[i].inspected += 1;
-                }
-            }
-        }
-        monkeys.sort_unstable_by(|a, b| a.inspected.cmp(&b.inspected));
-        assert_eq!(monkeys[6].inspected * monkeys[7].inspected, super::SECOND); // 19457438264
+        let monkeys = get_monkeys();
+        let mcm = monkeys.iter().map(|m| m.test).product::<u64>();
+        assert_eq!(get_top_monkeys(monkeys, 10000, |n| n % mcm), super::SECOND);
+        // 19457438264
     }
 }
