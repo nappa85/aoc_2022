@@ -12,7 +12,7 @@
 | 8 | Improved difficulty using only const-eval code, had to use nightly to increment const_eval_limit |
 | 9 | Improved difficulty using only const-eval code, had to use nightly to increment const_eval_limit, takes several minutes to compile |
 | 10 | Improved difficulty using only const-eval code |
-| 11 | Wasn't at home, didn't had my PC, made it on the fly the playground |
+| 11 | Improved difficulty using only const-eval code, had to use nightly to increment const_eval_limit |
 | 12 | Bare minimum... |
 | 13 | Bare minimum, and for the first time I've used an external crate (serde) |
 | 14 | Bare minimum... |
