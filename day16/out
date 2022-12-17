@@ -1,0 +1,17 @@
+   Compiling day16 v0.1.0 (/home/marco/Progetti/aoc/day16)
+warning: field `name` is never read
+ --> src/main.rs:5:5
+  |
+4 | struct Valve<'a> {
+  |        ----- field in this struct
+5 |     name: &'a str,
+  |     ^^^^
+  |
+  = note: `Valve` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+  = note: `#[warn(dead_code)]` on by default
+
+warning: `day16` (bin "day16") generated 1 warning
+    Finished dev [unoptimized + debuginfo] target(s) in 0.85s
+     Running `target/debug/day16`
+thread 'main' panicked at 'called `Option::unwrap()` on a `None` value', src/main.rs:103:35
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

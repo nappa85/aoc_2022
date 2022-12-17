@@ -17,3 +17,4 @@
 | 13 | Bare minimum, and for the first time I've used an external crate (serde) |
 | 14 | Bare minimum... |
 | 15 | Bare minimum... |
+| 16 | Bruteforced, only first part |
