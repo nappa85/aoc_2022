@@ -193,6 +193,6 @@ fn main() {
             })
             .collect::<Vec<_>>();
         perms.sort_unstable_by(|a, b| a.1.cmp(&b.1));
-        println!("{:?}", perms.last().unwrap()); //
+        println!("{:?}", perms.last().unwrap()); // 2052
     }
 }
