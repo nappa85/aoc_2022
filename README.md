@@ -19,3 +19,4 @@
 | 15 | Bare minimum... |
 | 16 | Bruteforced, only first part |
 | 17 | Bare minimum... |
+| 18 | Bare minimum... |
