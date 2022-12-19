@@ -242,7 +242,7 @@ fn get_materials<'a, I: Iterator<Item = &'a str>>(iter: I) -> Vec<Material> {
     res
 }
 
-fn get_best(blueprint: &Blueprint, turns: u8) -> u16 {
+fn get_best(blueprint: &Blueprint, turns: u8) -> u8 {
     let mut queue = vec![(Materials::default(), Bots::default(), 0)];
     let mut max = 0;
     let mut res = 0;
@@ -275,7 +275,9 @@ fn get_best(blueprint: &Blueprint, turns: u8) -> u16 {
             }
             {
                 let mut materials = materials;
-                if materials.build(Bot::Obsidian, &blueprint.obsidian_bot) {
+                if blueprint.get_cost(Bot::Geode, Material::Obsidian(0)) > bots.obsidian
+                    && materials.build(Bot::Obsidian, &blueprint.obsidian_bot)
+                {
                     let mut bots = bots;
                     bots.obsidian += 1;
                     #[cfg(debug_assertions)]
@@ -290,7 +292,9 @@ fn get_best(blueprint: &Blueprint, turns: u8) -> u16 {
             }
             {
                 let mut materials = materials;
-                if materials.build(Bot::Clay, &blueprint.clay_bot) {
+                if blueprint.get_cost(Bot::Obsidian, Material::Clay(0)) > bots.clay
+                    && materials.build(Bot::Clay, &blueprint.clay_bot)
+                {
                     let mut bots = bots;
                     bots.clay += 1;
                     #[cfg(debug_assertions)]
@@ -305,7 +309,14 @@ fn get_best(blueprint: &Blueprint, turns: u8) -> u16 {
             }
             {
                 let mut materials = materials;
-                if materials.build(Bot::Ore, &blueprint.ore_bot) {
+                if blueprint
+                    .get_cost(Bot::Geode, Material::Ore(0))
+                    .max(blueprint.get_cost(Bot::Obsidian, Material::Ore(0)))
+                    .max(blueprint.get_cost(Bot::Clay, Material::Ore(0)))
+                    .max(blueprint.get_cost(Bot::Ore, Material::Ore(0)))
+                    > bots.ore
+                    && materials.build(Bot::Ore, &blueprint.ore_bot)
+                {
                     let mut bots = bots;
                     bots.ore += 1;
                     #[cfg(debug_assertions)]
@@ -319,7 +330,7 @@ fn get_best(blueprint: &Blueprint, turns: u8) -> u16 {
                 }
             }
 
-            if skipped < 2 || !skippable {
+            if skipped < 3 || !skippable {
                 queue.push((
                     materials + production,
                     bots,
@@ -329,7 +340,7 @@ fn get_best(blueprint: &Blueprint, turns: u8) -> u16 {
         }
         max = next_max;
     }
-    dbg!(res as u16 * blueprint.id as u16)
+    res
 }
 
 fn main() {
@@ -368,8 +379,14 @@ fn main() {
         .collect::<Vec<_>>();
 
     let mut sum = 0;
-    for blueprint in blueprints {
-        sum += get_best(&blueprint, 24);
+    for blueprint in &blueprints {
+        sum += get_best(blueprint, 24) as u16 * blueprint.id as u16;
     }
-    println!("{sum}");
+    println!("{sum}"); // 1528
+
+    let mut mul = 1;
+    for blueprint in blueprints.into_iter().take(3) {
+        mul *= get_best(&blueprint, 32) as u16;
+    }
+    println!("{mul}"); // 16926
 }
