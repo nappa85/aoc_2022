@@ -242,71 +242,99 @@ fn get_materials<'a, I: Iterator<Item = &'a str>>(iter: I) -> Vec<Material> {
     res
 }
 
-fn get_best(blueprint: &Blueprint, mut materials: Materials, bots: Bots, turn: u8) -> Option<u16> {
-    if turn == 0 {
-        return Some(materials.geode as u16 * blueprint.id as u16);
-    }
+fn get_best(blueprint: &Blueprint, turns: u8) -> u16 {
+    let mut queue = vec![(Materials::default(), Bots::default(), 0)];
+    let mut max = 0;
+    let mut res = 0;
+    for _ in 0..turns {
+        let mut next_max = max;
+        for (materials, bots, skipped) in std::mem::take(&mut queue) {
+            if bots.geode < max {
+                continue;
+            }
 
-    let production = bots.produce(&materials);
-    [
-        if materials.build(Bot::Geode, &blueprint.geode_bot) {
-            let mut bots = bots;
-            bots.geode += 1;
-            #[cfg(debug_assertions)]
-            println!(
-                "The new geode-cracking robot is ready; you now have {} of them.",
-                bots.geode
-            );
-            get_best(blueprint, materials + production, bots, turn - 1)
-        } else {
-            None
-        },
-        if materials.build(Bot::Obsidian, &blueprint.obsidian_bot) {
-            let mut bots = bots;
-            bots.obsidian += 1;
-            #[cfg(debug_assertions)]
-            println!(
-                "The new obsidian-collecting robot is ready; you now have {} of them.",
-                bots.obsidian
-            );
-            get_best(blueprint, materials + production, bots, turn - 1)
-        } else {
-            None
-        },
-        if materials.build(Bot::Clay, &blueprint.clay_bot) {
-            let mut bots = bots;
-            bots.clay += 1;
-            #[cfg(debug_assertions)]
-            println!(
-                "The new clay-collecting robot is ready; you now have {} of them.",
-                bots.clay
-            );
-            get_best(blueprint, materials + production, bots, turn - 1)
-        } else {
-            None
-        },
-        if materials.build(Bot::Ore, &blueprint.ore_bot) {
-            let mut bots = bots;
-            bots.ore += 1;
-            #[cfg(debug_assertions)]
-            println!(
-                "The new ore-collecting robot is ready; you now have {} of them.",
-                bots.ore
-            );
-            get_best(blueprint, materials + production, bots, turn - 1)
-        } else {
-            None
-        },
-        get_best(blueprint, materials + production, bots, turn - 1),
-    ]
-    .into_iter()
-    .flatten()
-    .max()
+            let production = bots.produce(&materials);
+            res = res.max(materials.geode + production.geode);
+
+            let mut skippable = false;
+            {
+                let mut materials = materials;
+                if materials.build(Bot::Geode, &blueprint.geode_bot) {
+                    let mut bots = bots;
+                    bots.geode += 1;
+                    #[cfg(debug_assertions)]
+                    println!(
+                        "The new geode-cracking robot is ready; you now have {} of them.",
+                        bots.geode
+                    );
+
+                    queue.push((materials + production, bots, 0));
+                    next_max = bots.geode;
+                    continue; // skip other bots
+                }
+            }
+            {
+                let mut materials = materials;
+                if materials.build(Bot::Obsidian, &blueprint.obsidian_bot) {
+                    let mut bots = bots;
+                    bots.obsidian += 1;
+                    #[cfg(debug_assertions)]
+                    println!(
+                        "The new obsidian-collecting robot is ready; you now have {} of them.",
+                        bots.obsidian
+                    );
+
+                    queue.push((materials + production, bots, 0));
+                    skippable = true;
+                }
+            }
+            {
+                let mut materials = materials;
+                if materials.build(Bot::Clay, &blueprint.clay_bot) {
+                    let mut bots = bots;
+                    bots.clay += 1;
+                    #[cfg(debug_assertions)]
+                    println!(
+                        "The new clay-collecting robot is ready; you now have {} of them.",
+                        bots.clay
+                    );
+
+                    queue.push((materials + production, bots, 0));
+                    skippable = true;
+                }
+            }
+            {
+                let mut materials = materials;
+                if materials.build(Bot::Ore, &blueprint.ore_bot) {
+                    let mut bots = bots;
+                    bots.ore += 1;
+                    #[cfg(debug_assertions)]
+                    println!(
+                        "The new ore-collecting robot is ready; you now have {} of them.",
+                        bots.ore
+                    );
+
+                    queue.push((materials + production, bots, 0));
+                    skippable = true;
+                }
+            }
+
+            if skipped < 2 || !skippable {
+                queue.push((
+                    materials + production,
+                    bots,
+                    if skippable { skipped + 1 } else { 0 },
+                ));
+            }
+        }
+        max = next_max;
+    }
+    dbg!(res as u16 * blueprint.id as u16)
 }
 
 fn main() {
-    // let input = include_str!("../input");
-    let input = include_str!("../example");
+    let input = include_str!("../input");
+    // let input = include_str!("../example");
     let blueprints = input
         .lines()
         .map(|s| {
@@ -340,8 +368,8 @@ fn main() {
         .collect::<Vec<_>>();
 
     let mut sum = 0;
-    for blueprint in blueprints.into_iter().take(1) {
-        sum += get_best(&blueprint, Materials::default(), Bots::default(), 30).unwrap_or_default();
+    for blueprint in blueprints {
+        sum += get_best(&blueprint, 24);
     }
     println!("{sum}");
 }
