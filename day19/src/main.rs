@@ -1,4 +1,4 @@
-use std::{fmt::Display, ops::AddAssign};
+use std::{fmt::Display, ops::Add};
 
 #[derive(Copy, Clone, Debug)]
 enum Material {
@@ -78,6 +78,7 @@ impl Blueprint {
     }
 }
 
+#[derive(Copy, Clone, Debug)]
 enum Bot {
     Ore,
     Clay,
@@ -96,7 +97,7 @@ impl Display for Bot {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Copy, Clone, Debug)]
 struct Bots {
     ore: u8,
     clay: u8,
@@ -104,42 +105,65 @@ struct Bots {
     geode: u8,
 }
 
-impl Bots {
-    fn produce(&self) -> Materials {
-        let mut materials = Materials::default();
-        if self.ore > 0 {
-            materials.ore += self.ore;
-            println!(
-                "{} ore-collecting robot collects {} ore; you now have {} ore.",
-                self.ore, self.ore, materials.ore
-            )
+impl Default for Bots {
+    fn default() -> Self {
+        Bots {
+            ore: 1,
+            clay: 0,
+            obsidian: 0,
+            geode: 0,
         }
-        if self.clay > 0 {
-            materials.clay += self.clay;
-            println!(
-                "{} clay-collecting robot collects {} clay; you now have {} clay.",
-                self.clay, self.clay, materials.clay
-            )
-        }
-        if self.obsidian > 0 {
-            materials.obsidian += self.obsidian;
-            println!(
-                "{} obsidian-collecting robot collects {} obsidian; you now have {} obsidian.",
-                self.obsidian, self.obsidian, materials.obsidian
-            )
-        }
-        if self.geode > 0 {
-            materials.geode += self.geode;
-            println!(
-                "{} geode-cracking robot crack {} geode; you now have {} geode.",
-                self.geode, self.geode, materials.geode
-            )
-        }
-        materials
     }
 }
 
-#[derive(Debug, Default)]
+impl Bots {
+    fn produce(&self, _materials: &Materials) -> Materials {
+        let mut production = Materials::default();
+        if self.ore > 0 {
+            production.ore += self.ore;
+            #[cfg(debug_assertions)]
+            println!(
+                "{} ore-collecting robot collects {} ore; you now have {} ore.",
+                self.ore,
+                self.ore,
+                _materials.ore + production.ore
+            )
+        }
+        if self.clay > 0 {
+            production.clay += self.clay;
+            #[cfg(debug_assertions)]
+            println!(
+                "{} clay-collecting robot collects {} clay; you now have {} clay.",
+                self.clay,
+                self.clay,
+                _materials.clay + production.clay
+            )
+        }
+        if self.obsidian > 0 {
+            production.obsidian += self.obsidian;
+            #[cfg(debug_assertions)]
+            println!(
+                "{} obsidian-collecting robot collects {} obsidian; you now have {} obsidian.",
+                self.obsidian,
+                self.obsidian,
+                _materials.obsidian + production.obsidian
+            )
+        }
+        if self.geode > 0 {
+            production.geode += self.geode;
+            #[cfg(debug_assertions)]
+            println!(
+                "{} geode-cracking robot crack {} geode; you now have {} geode.",
+                self.geode,
+                self.geode,
+                _materials.geode + production.geode
+            )
+        }
+        production
+    }
+}
+
+#[derive(Copy, Clone, Debug, Default)]
 struct Materials {
     ore: u8,
     clay: u8,
@@ -148,7 +172,7 @@ struct Materials {
 }
 
 impl Materials {
-    fn build(&mut self, bot: Bot, materials: &[Material]) -> bool {
+    fn build(&mut self, _bot: Bot, materials: &[Material]) -> bool {
         for material in materials {
             match material {
                 Material::Ore(n) if self.ore < *n => return false,
@@ -158,41 +182,49 @@ impl Materials {
             }
         }
 
+        #[cfg(debug_assertions)]
         print!("Spend");
         let mut first = true;
         for material in materials {
             if first {
                 first = false;
             } else {
+                #[cfg(debug_assertions)]
                 print!(" and")
             }
             match material {
                 Material::Ore(n) => {
+                    #[cfg(debug_assertions)]
                     print!(" {n} ore");
                     self.ore -= *n;
                 }
                 Material::Clay(n) => {
+                    #[cfg(debug_assertions)]
                     print!(" {n} clay");
                     self.clay -= *n;
                 }
                 Material::Obsidian(n) => {
+                    #[cfg(debug_assertions)]
                     print!(" {n} obsidian");
                     self.obsidian -= *n;
                 }
             }
         }
-        println!(" to start building a {}.", bot);
+        #[cfg(debug_assertions)]
+        println!(" to start building a {}.", _bot);
 
         true
     }
 }
 
-impl AddAssign for Materials {
-    fn add_assign(&mut self, rhs: Self) {
+impl Add for Materials {
+    type Output = Materials;
+    fn add(mut self, rhs: Self) -> Self::Output {
         self.ore += rhs.ore;
         self.clay += rhs.clay;
         self.obsidian += rhs.obsidian;
         self.geode += rhs.geode;
+        self
     }
 }
 
@@ -210,9 +242,71 @@ fn get_materials<'a, I: Iterator<Item = &'a str>>(iter: I) -> Vec<Material> {
     res
 }
 
+fn get_best(blueprint: &Blueprint, mut materials: Materials, bots: Bots, turn: u8) -> Option<u16> {
+    if turn == 0 {
+        return Some(materials.geode as u16 * blueprint.id as u16);
+    }
+
+    let production = bots.produce(&materials);
+    [
+        if materials.build(Bot::Geode, &blueprint.geode_bot) {
+            let mut bots = bots;
+            bots.geode += 1;
+            #[cfg(debug_assertions)]
+            println!(
+                "The new geode-cracking robot is ready; you now have {} of them.",
+                bots.geode
+            );
+            get_best(blueprint, materials + production, bots, turn - 1)
+        } else {
+            None
+        },
+        if materials.build(Bot::Obsidian, &blueprint.obsidian_bot) {
+            let mut bots = bots;
+            bots.obsidian += 1;
+            #[cfg(debug_assertions)]
+            println!(
+                "The new obsidian-collecting robot is ready; you now have {} of them.",
+                bots.obsidian
+            );
+            get_best(blueprint, materials + production, bots, turn - 1)
+        } else {
+            None
+        },
+        if materials.build(Bot::Clay, &blueprint.clay_bot) {
+            let mut bots = bots;
+            bots.clay += 1;
+            #[cfg(debug_assertions)]
+            println!(
+                "The new clay-collecting robot is ready; you now have {} of them.",
+                bots.clay
+            );
+            get_best(blueprint, materials + production, bots, turn - 1)
+        } else {
+            None
+        },
+        if materials.build(Bot::Ore, &blueprint.ore_bot) {
+            let mut bots = bots;
+            bots.ore += 1;
+            #[cfg(debug_assertions)]
+            println!(
+                "The new ore-collecting robot is ready; you now have {} of them.",
+                bots.ore
+            );
+            get_best(blueprint, materials + production, bots, turn - 1)
+        } else {
+            None
+        },
+        get_best(blueprint, materials + production, bots, turn - 1),
+    ]
+    .into_iter()
+    .flatten()
+    .max()
+}
+
 fn main() {
-    let input = include_str!("../input");
-    // let input = include_str!("../example");
+    // let input = include_str!("../input");
+    let input = include_str!("../example");
     let blueprints = input
         .lines()
         .map(|s| {
@@ -246,50 +340,8 @@ fn main() {
         .collect::<Vec<_>>();
 
     let mut sum = 0;
-    for blueprint in blueprints {
-        let mut materials = Materials::default();
-        let mut bots = Bots::default();
-        bots.ore += 1;
-        for i in 0..24 {
-            println!("== Minute {} == ", i + 1);
-            let production = bots.produce();
-            if materials.build(Bot::Geode, &blueprint.geode_bot) {
-                bots.geode += 1;
-                println!(
-                    "The new geode-cracking robot is ready; you now have {} of them.",
-                    bots.geode
-                );
-            } else if blueprint.get_cost(Bot::Geode, Material::Obsidian(0)) > materials.obsidian
-                && materials.build(Bot::Obsidian, &blueprint.obsidian_bot)
-            {
-                bots.obsidian += 1;
-                println!(
-                    "The new obsidian-collecting robot is ready; you now have {} of them.",
-                    bots.obsidian
-                );
-            } else if blueprint.get_cost(Bot::Obsidian, Material::Clay(0)) > materials.clay
-                && materials.build(Bot::Clay, &blueprint.clay_bot)
-            {
-                bots.clay += 1;
-                println!(
-                    "The new clay-collecting robot is ready; you now have {} of them.",
-                    bots.clay
-                );
-            } else if blueprint.get_cost(Bot::Clay, Material::Ore(0)) > materials.ore
-                && blueprint.get_cost(Bot::Obsidian, Material::Ore(0)) > materials.ore
-                && blueprint.get_cost(Bot::Geode, Material::Ore(0)) > materials.ore
-                && materials.build(Bot::Ore, &blueprint.ore_bot)
-            {
-                bots.ore += 1;
-                println!(
-                    "The new ore-collecting robot is ready; you now have {} of them.",
-                    bots.ore
-                );
-            }
-            materials += production;
-            println!("");
-        }
-        sum += materials.geode as u16 * blueprint.id as u16;
+    for blueprint in blueprints.into_iter().take(1) {
+        sum += get_best(&blueprint, Materials::default(), Bots::default(), 30).unwrap_or_default();
     }
     println!("{sum}");
 }
