@@ -21,4 +21,5 @@
 | 17 | Bare minimum... |
 | 18 | Bare minimum... |
 | 19 | Bare minimum... |
-| 20 | Working on it |
+| 20 | Bare minimum... |
+| 21 | Bare minimum... |
