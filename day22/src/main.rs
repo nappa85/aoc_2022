@@ -125,12 +125,6 @@ fn parse(input: &str) -> (Vec<Vec<Tile>>, Vec<Move>) {
     (map, moves)
 }
 
-fn main() {
-    let input = include_str!("../input");
-    let (map, moves) = parse(input);
-    println!("{}", trip(&map, &moves));
-}
-
 fn trip(map: &[Vec<Tile>], moves: &[Move]) -> usize {
     let mut direction = Direction::default();
     let mut position = (0, map[0].iter().position(Tile::is_open).unwrap());
@@ -144,7 +138,8 @@ fn trip(map: &[Vec<Tile>], moves: &[Move]) -> usize {
                         .iter()
                         .enumerate()
                         .cycle()
-                        .skip(x + 1)
+                        .skip_while(|(nx, _)| *nx != x)
+                        .skip(1)
                         .filter(|(_, row)| row.len() > y && !row[y].is_none())
                         .take(*n)
                         .take_while(|(_, row)| !row[y].is_wall())
@@ -162,7 +157,8 @@ fn trip(map: &[Vec<Tile>], moves: &[Move]) -> usize {
                         .enumerate()
                         .rev()
                         .cycle()
-                        .skip(map.len() - (x + 1))
+                        .skip_while(|(nx, _)| *nx != x)
+                        .skip(1)
                         .filter(|(_, row)| row.len() > y && !row[y].is_none())
                         .take(*n)
                         .take_while(|(_, row)| !row[y].is_wall())
@@ -179,7 +175,8 @@ fn trip(map: &[Vec<Tile>], moves: &[Move]) -> usize {
                         .iter()
                         .enumerate()
                         .cycle()
-                        .skip(y + 1)
+                        .skip_while(|(ny, _)| *ny != y)
+                        .skip(1)
                         .filter(|(_, t)| !t.is_none())
                         .take(*n)
                         .take_while(|(_, t)| !t.is_wall())
@@ -197,7 +194,8 @@ fn trip(map: &[Vec<Tile>], moves: &[Move]) -> usize {
                         .enumerate()
                         .rev()
                         .cycle()
-                        .skip(map[x].len() - (y + 1))
+                        .skip_while(|(ny, _)| *ny != y)
+                        .skip(1)
                         .filter(|(_, t)| !t.is_none())
                         .take(*n)
                         .take_while(|(_, t)| !t.is_wall())
@@ -212,6 +210,12 @@ fn trip(map: &[Vec<Tile>], moves: &[Move]) -> usize {
         }
     }
     1000 * (position.0 + 1) + 4 * (position.1 + 1) + direction.get_points()
+}
+
+fn main() {
+    let input = include_str!("../input");
+    let (map, moves) = parse(input);
+    println!("{}", trip(&map, &moves)); // 95358
 }
 
 #[cfg(test)]
