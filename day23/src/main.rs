@@ -27,7 +27,7 @@ fn get_directions(skip: usize) -> impl Iterator<Item = Direction> {
     .skip(skip)
 }
 
-fn solve(mut elves: Vec<Vec<bool>>, turns: usize) -> usize {
+fn solve(mut elves: Vec<Vec<bool>>, turns: usize) -> Result<usize, usize> {
     for turn in 0..turns {
         // expand grid
         elves.insert(0, vec![false; elves[0].len()]);
@@ -46,6 +46,17 @@ fn solve(mut elves: Vec<Vec<bool>>, turns: usize) -> usize {
                 .enumerate()
                 .filter(|(_, e)| **e)
                 .for_each(|(y, _)| {
+                    if !elves[x - 1][y - 1]
+                        && !elves[x - 1][y]
+                        && !elves[x - 1][y + 1]
+                        && !elves[x][y - 1]
+                        && !elves[x][y + 1]
+                        && !elves[x + 1][y - 1]
+                        && !elves[x + 1][y]
+                        && !elves[x + 1][y + 1]
+                    {
+                        return;
+                    }
                     for direction in get_directions(turn).take(4) {
                         match direction {
                             Direction::North => {
@@ -88,6 +99,11 @@ fn solve(mut elves: Vec<Vec<bool>>, turns: usize) -> usize {
                     }
                 })
         });
+
+        if desiderata.is_empty() {
+            return Err(turn + 1);
+        }
+
         desiderata
             .into_iter()
             .filter(|(_, v)| v.len() == 1)
@@ -98,34 +114,36 @@ fn solve(mut elves: Vec<Vec<bool>>, turns: usize) -> usize {
                 assert!(!elves[tx][ty]);
                 elves[tx][ty] = true;
             });
-        elves.iter().for_each(|es| {
-            es.iter()
-                .for_each(|b| if *b { print!("#") } else { print!(".") });
-            println!("");
-        });
-        println!("");
+        // elves.iter().for_each(|es| {
+        //     es.iter()
+        //         .for_each(|b| if *b { print!("#") } else { print!(".") });
+        //     println!("");
+        // });
+        // println!("");
     }
 
     let mut x_iter = elves
         .iter()
         .enumerate()
-        .filter(|(_, es)| es.iter().all(|b| !b));
+        .filter(|(_, es)| !es.iter().all(|b| !b));
     let min_x = x_iter.next().unwrap().0;
     let max_x = x_iter.last().unwrap().0;
-    let mut y_iter = (0..elves[0].len()).filter(|y| elves.iter().all(|es| !es[*y]));
+    let mut y_iter = (0..elves[0].len()).filter(|y| !elves.iter().all(|es| !es[*y]));
     let min_y = y_iter.next().unwrap();
     let max_y = y_iter.last().unwrap();
-    elves[min_x..=max_x]
+    Ok(elves[min_x..=max_x]
         .iter()
         .flat_map(|es| es[min_y..=max_y].iter())
-        .filter(|b| **b)
-        .count()
+        .filter(|b| !*b)
+        .count())
 }
 
 fn main() {
     let input = include_str!("../input");
     let elves = parse(input);
-    println!("{}", solve(elves, 10));
+    println!("{}", solve(elves.clone(), 10).unwrap()); // 3815
+
+    println!("{}", solve(elves, 1000).unwrap_err()); // 893
 }
 
 #[cfg(test)]
@@ -183,6 +201,13 @@ mod tests {
     fn first() {
         let input = include_str!("../example");
         let elves = super::parse(input);
-        assert_eq!(super::solve(elves, 10), 110);
+        assert_eq!(super::solve(elves, 10), Ok(110));
+    }
+
+    #[test]
+    fn second() {
+        let input = include_str!("../example");
+        let elves = super::parse(input);
+        assert_eq!(super::solve(elves, 100), Err(20));
     }
 }
