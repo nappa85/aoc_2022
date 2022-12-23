@@ -429,28 +429,30 @@ impl Cube {
             )
                 as Box<dyn Iterator<Item = (Face, usize, usize, (Tile, usize, usize))>>,
             Direction3D::TopEastBottomWest => Box::new(
-                //become a row
-                self.top[x]
+                self.top[y]
                     .iter()
                     .enumerate()
                     .map(move |(i, t)| (Face::Top, x, i, *t))
                     .chain(
+                        //become a column
                         self.east
                             .iter()
                             .enumerate()
                             .map(move |(i, t)| (Face::East, i, y, t[y])),
                     )
                     .chain(
-                        //become a row
-                        self.bottom[x]
+                        self.bottom[y]
                             .iter()
                             .enumerate()
+                            .rev()
                             .map(move |(i, t)| (Face::Bottom, x, i, *t)),
                     )
                     .chain(
+                        //become a column
                         self.west
                             .iter()
                             .enumerate()
+                            .rev()
                             .map(move |(i, t)| (Face::West, i, y, t[y])),
                     )
                     .cycle(),
@@ -487,21 +489,20 @@ impl Cube {
             )
                 as Box<dyn Iterator<Item = (Face, usize, usize, (Tile, usize, usize))>>,
             Direction3D::TopWestBottomEast => Box::new(
-                //become a row
                 self.top[x]
                     .iter()
                     .enumerate()
                     .rev()
                     .map(move |(i, t)| (Face::Top, x, i, *t))
                     .chain(
+                        //become a column
                         self.west
                             .iter()
                             .enumerate()
                             .rev()
-                            .map(move |(i, t)| (Face::West, i, y, t[y])),
+                            .map(move |(i, t)| (Face::West, i, y, t[x])),
                     )
                     .chain(
-                        //become a row
                         self.bottom[x]
                             .iter()
                             .enumerate()
@@ -509,11 +510,12 @@ impl Cube {
                             .map(move |(i, t)| (Face::Bottom, x, i, *t)),
                     )
                     .chain(
+                        //become a column
                         self.east
                             .iter()
                             .enumerate()
                             .rev()
-                            .map(move |(i, t)| (Face::East, i, y, t[y])),
+                            .map(move |(i, t)| (Face::East, i, y, t[x])),
                     )
                     .cycle(),
             )
@@ -746,6 +748,7 @@ mod tests {
                 .collect::<Vec<_>>(),
             // must be rotated 90°
             east: ((step_y * 3)..(step_y * 4))
+                .rev()
                 .map(|y| {
                     ((step_x * 2)..(step_x * 3))
                         .map(move |x| (map[x][y], x, y))
@@ -753,6 +756,16 @@ mod tests {
                 })
                 .collect::<Vec<_>>(),
         };
+
+        cube_map
+            .get_iter(1, 2, super::Direction3D::TopEastBottomWest)
+            .skip_while(|(f, nx, ny, _)| *f != super::Face::East || *nx != 1 || *ny != 2)
+            .take(10)
+            .for_each(|(_, _, _, (t, _, _))| match t {
+                super::Tile::None => print!(" "),
+                super::Tile::Open => print!("."),
+                super::Tile::Wall => print!("#"),
+            });
         assert_eq!(super::cube(&cube_map, &moves), 5031);
     }
 }
