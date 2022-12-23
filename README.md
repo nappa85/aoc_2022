@@ -23,4 +23,4 @@
 | 19 | Bare minimum... |
 | 20 | Bare minimum... |
 | 21 | Bare minimum... |
-| 22 | Work in progress... |
+| 22 | Solved only first part... |
