@@ -554,7 +554,7 @@ impl Cube {
                         self.west
                             .iter()
                             .enumerate()
-                            .map(move |(i, t)| (Face::West, i, j2, t[j2])),
+                            .map(move |(i, t)| (Face::West, i, j1, t[j1])),
                     )
                     .chain(
                         self.bottom[j2]
@@ -568,7 +568,7 @@ impl Cube {
                             .iter()
                             .enumerate()
                             .rev()
-                            .map(move |(i, t)| (Face::East, i, j1, t[j1])),
+                            .map(move |(i, t)| (Face::East, i, j2, t[j2])),
                     )
                     .cycle()
             })
@@ -704,33 +704,23 @@ fn main() {
     let step_y = map.iter().map(|row| row.len()).max().unwrap() / 3;
     let map = &map;
     let cube_map = Cube {
-        top: map
-            .iter()
-            .enumerate()
-            .filter(|(x, _)| x / step_x == 0)
-            .map(|(x, row)| {
-                row.iter()
-                    .enumerate()
-                    .filter(|(y, _)| y / step_y == 1)
-                    .map(|(y, t)| (*t, x, y))
-                    .collect::<Vec<_>>()
+        top: (0..step_x)
+            .map(|x| {
+                (step_y..(step_y * 2))
+                    .map(move |y| (map[x][y], x, y))
+                    .collect()
+            })
+            .collect::<Vec<_>>(),
+        south: (step_x..(step_x * 2))
+            .map(|x| {
+                (step_y..(step_y * 2))
+                    .map(move |y| (map[x][y], x, y))
+                    .collect()
             })
             .collect::<Vec<_>>(),
         // must be rotated 90°
         east: ((step_y * 2)..(step_y * 3))
             .map(|y| (0..step_x).map(move |x| (map[x][y], x, y)).collect())
-            .collect::<Vec<_>>(),
-        south: map
-            .iter()
-            .enumerate()
-            .filter(|(x, _)| x / step_x == 1)
-            .map(|(x, row)| {
-                row.iter()
-                    .enumerate()
-                    .filter(|(y, _)| y / step_y == 1)
-                    .map(|(y, t)| (*t, x, y))
-                    .collect::<Vec<_>>()
-            })
             .collect::<Vec<_>>(),
         // must be rotated 90°
         west: (0..step_y)
@@ -740,16 +730,11 @@ fn main() {
                     .collect()
             })
             .collect::<Vec<_>>(),
-        bottom: map
-            .iter()
-            .enumerate()
-            .filter(|(x, _)| x / step_x == 2)
-            .map(|(x, row)| {
-                row.iter()
-                    .enumerate()
-                    .filter(|(y, _)| y / step_y == 1)
-                    .map(|(y, t)| (*t, x, y))
-                    .collect::<Vec<_>>()
+        bottom: ((step_x * 2)..(step_x * 3))
+            .map(|x| {
+                (step_y..(step_y * 2))
+                    .map(move |y| (map[x][y], x, y))
+                    .collect()
             })
             .collect::<Vec<_>>(),
         // must be rotated 90°
@@ -761,7 +746,7 @@ fn main() {
             })
             .collect::<Vec<_>>(),
     };
-    println!("{}", cube(&cube_map, &moves));
+    println!("{}", cube(&cube_map, &moves)); // 144361
 }
 
 #[cfg(test)]
@@ -825,20 +810,6 @@ mod tests {
                 .collect::<Vec<_>>(),
         };
 
-        // cube_map
-        //     .get_iter(
-        //         2,
-        //         2,
-        //         super::Direction3D::TopSouthBottomNorth,
-        //         super::Face::Bottom,
-        //     )
-        //     .skip_while(|(f, nx, ny, _)| *f != super::Face::Bottom || *nx != 2 || *ny != 2)
-        //     .take(10)
-        //     .for_each(|(_, _, _, (t, _, _))| match t {
-        //         super::Tile::None => print!(" "),
-        //         super::Tile::Open => print!("."),
-        //         super::Tile::Wall => print!("#"),
-        //     });
         assert_eq!(super::cube(&cube_map, &moves), 5031);
     }
 }
