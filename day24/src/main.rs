@@ -112,13 +112,18 @@ fn traverse(
         }
         pos.sort_unstable();
         pos.dedup();
+
+        #[cfg(debug_assertions)]
         println!("{turn} {}", pos.len());
+
         if pos.is_empty() {
             panic!("no more positions at turn {turn}");
         }
         turn += 1;
         if pos.contains(&target) {
+            #[cfg(debug_assertions)]
             println!("reached target {target:?} un {turn} turns");
+
             if targets.is_empty() {
                 break;
             } else {
@@ -142,7 +147,7 @@ fn main() {
             vec![(x, y - 1), (0, 1), (x, y - 1)],
             &blizzards
         )
-    );
+    ); // 974
 }
 
 #[cfg(test)]
