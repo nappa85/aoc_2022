@@ -214,371 +214,371 @@ struct Cube {
     bottom: Vec<Vec<(Tile, usize, usize)>>,
 }
 
-#[derive(Clone, Copy, Debug)]
-enum Direction3D {
-    TopNorthBottomSouth,
-    TopEastBottomWest,
-    TopSouthBottomNorth,
-    TopWestBottomEast,
-    NorthEastSouthWest,
-    NorthWestSouthEast,
-}
+// #[derive(Clone, Copy, Debug)]
+// enum Direction3D {
+//     TopNorthBottomSouth,
+//     TopEastBottomWest,
+//     TopSouthBottomNorth,
+//     TopWestBottomEast,
+//     NorthEastSouthWest,
+//     NorthWestSouthEast,
+// }
 
-impl Default for Direction3D {
-    fn default() -> Self {
-        Direction3D::TopEastBottomWest
-    }
-}
+// impl Default for Direction3D {
+//     fn default() -> Self {
+//         Direction3D::TopEastBottomWest
+//     }
+// }
 
-impl AddAssign<(Rotation, Face)> for Direction3D {
-    fn add_assign(&mut self, rhs: (Rotation, Face)) {
-        match (&self, rhs) {
-            (Direction3D::TopNorthBottomSouth, (Rotation::Clockwise, Face::Top)) => {
-                *self = Direction3D::TopEastBottomWest
-            }
-            (Direction3D::TopNorthBottomSouth, (Rotation::Clockwise, Face::North)) => {
-                *self = Direction3D::NorthEastSouthWest
-            }
-            (Direction3D::TopNorthBottomSouth, (Rotation::Clockwise, Face::Bottom)) => {
-                *self = Direction3D::TopWestBottomEast
-            }
-            (Direction3D::TopNorthBottomSouth, (Rotation::Clockwise, Face::South)) => {
-                *self = Direction3D::NorthWestSouthEast
-            }
+// impl AddAssign<(Rotation, Face)> for Direction3D {
+//     fn add_assign(&mut self, rhs: (Rotation, Face)) {
+//         match (&self, rhs) {
+//             (Direction3D::TopNorthBottomSouth, (Rotation::Clockwise, Face::Top)) => {
+//                 *self = Direction3D::TopEastBottomWest
+//             }
+//             (Direction3D::TopNorthBottomSouth, (Rotation::Clockwise, Face::North)) => {
+//                 *self = Direction3D::NorthEastSouthWest
+//             }
+//             (Direction3D::TopNorthBottomSouth, (Rotation::Clockwise, Face::Bottom)) => {
+//                 *self = Direction3D::TopWestBottomEast
+//             }
+//             (Direction3D::TopNorthBottomSouth, (Rotation::Clockwise, Face::South)) => {
+//                 *self = Direction3D::NorthWestSouthEast
+//             }
 
-            (Direction3D::TopNorthBottomSouth, (Rotation::Counterclockwise, Face::Top)) => {
-                *self = Direction3D::TopWestBottomEast
-            }
-            (Direction3D::TopNorthBottomSouth, (Rotation::Counterclockwise, Face::North)) => {
-                *self = Direction3D::NorthWestSouthEast
-            }
-            (Direction3D::TopNorthBottomSouth, (Rotation::Counterclockwise, Face::Bottom)) => {
-                *self = Direction3D::TopEastBottomWest
-            }
-            (Direction3D::TopNorthBottomSouth, (Rotation::Counterclockwise, Face::South)) => {
-                *self = Direction3D::NorthEastSouthWest
-            }
+//             (Direction3D::TopNorthBottomSouth, (Rotation::Counterclockwise, Face::Top)) => {
+//                 *self = Direction3D::TopWestBottomEast
+//             }
+//             (Direction3D::TopNorthBottomSouth, (Rotation::Counterclockwise, Face::North)) => {
+//                 *self = Direction3D::NorthWestSouthEast
+//             }
+//             (Direction3D::TopNorthBottomSouth, (Rotation::Counterclockwise, Face::Bottom)) => {
+//                 *self = Direction3D::TopEastBottomWest
+//             }
+//             (Direction3D::TopNorthBottomSouth, (Rotation::Counterclockwise, Face::South)) => {
+//                 *self = Direction3D::NorthEastSouthWest
+//             }
 
-            (Direction3D::TopEastBottomWest, (Rotation::Clockwise, Face::Top)) => {
-                *self = Direction3D::TopSouthBottomNorth
-            }
-            (Direction3D::TopEastBottomWest, (Rotation::Clockwise, Face::East)) => {
-                *self = Direction3D::NorthEastSouthWest
-            }
-            (Direction3D::TopEastBottomWest, (Rotation::Clockwise, Face::Bottom)) => {
-                *self = Direction3D::TopNorthBottomSouth
-            }
-            (Direction3D::TopEastBottomWest, (Rotation::Clockwise, Face::West)) => {
-                *self = Direction3D::NorthWestSouthEast
-            }
+//             (Direction3D::TopEastBottomWest, (Rotation::Clockwise, Face::Top)) => {
+//                 *self = Direction3D::TopSouthBottomNorth
+//             }
+//             (Direction3D::TopEastBottomWest, (Rotation::Clockwise, Face::East)) => {
+//                 *self = Direction3D::NorthEastSouthWest
+//             }
+//             (Direction3D::TopEastBottomWest, (Rotation::Clockwise, Face::Bottom)) => {
+//                 *self = Direction3D::TopNorthBottomSouth
+//             }
+//             (Direction3D::TopEastBottomWest, (Rotation::Clockwise, Face::West)) => {
+//                 *self = Direction3D::NorthWestSouthEast
+//             }
 
-            (Direction3D::TopEastBottomWest, (Rotation::Counterclockwise, Face::Top)) => {
-                *self = Direction3D::TopNorthBottomSouth
-            }
-            (Direction3D::TopEastBottomWest, (Rotation::Counterclockwise, Face::East)) => {
-                *self = Direction3D::NorthWestSouthEast
-            }
-            (Direction3D::TopEastBottomWest, (Rotation::Counterclockwise, Face::Bottom)) => {
-                *self = Direction3D::TopSouthBottomNorth
-            }
-            (Direction3D::TopEastBottomWest, (Rotation::Counterclockwise, Face::West)) => {
-                *self = Direction3D::NorthEastSouthWest
-            }
+//             (Direction3D::TopEastBottomWest, (Rotation::Counterclockwise, Face::Top)) => {
+//                 *self = Direction3D::TopNorthBottomSouth
+//             }
+//             (Direction3D::TopEastBottomWest, (Rotation::Counterclockwise, Face::East)) => {
+//                 *self = Direction3D::NorthWestSouthEast
+//             }
+//             (Direction3D::TopEastBottomWest, (Rotation::Counterclockwise, Face::Bottom)) => {
+//                 *self = Direction3D::TopSouthBottomNorth
+//             }
+//             (Direction3D::TopEastBottomWest, (Rotation::Counterclockwise, Face::West)) => {
+//                 *self = Direction3D::NorthEastSouthWest
+//             }
 
-            (Direction3D::TopSouthBottomNorth, (Rotation::Clockwise, Face::Top)) => {
-                *self = Direction3D::TopWestBottomEast
-            }
-            (Direction3D::TopSouthBottomNorth, (Rotation::Clockwise, Face::South)) => {
-                *self = Direction3D::NorthEastSouthWest
-            }
-            (Direction3D::TopSouthBottomNorth, (Rotation::Clockwise, Face::Bottom)) => {
-                *self = Direction3D::TopEastBottomWest
-            }
-            (Direction3D::TopSouthBottomNorth, (Rotation::Clockwise, Face::North)) => {
-                *self = Direction3D::NorthWestSouthEast
-            }
+//             (Direction3D::TopSouthBottomNorth, (Rotation::Clockwise, Face::Top)) => {
+//                 *self = Direction3D::TopWestBottomEast
+//             }
+//             (Direction3D::TopSouthBottomNorth, (Rotation::Clockwise, Face::South)) => {
+//                 *self = Direction3D::NorthEastSouthWest
+//             }
+//             (Direction3D::TopSouthBottomNorth, (Rotation::Clockwise, Face::Bottom)) => {
+//                 *self = Direction3D::TopEastBottomWest
+//             }
+//             (Direction3D::TopSouthBottomNorth, (Rotation::Clockwise, Face::North)) => {
+//                 *self = Direction3D::NorthWestSouthEast
+//             }
 
-            (Direction3D::TopSouthBottomNorth, (Rotation::Counterclockwise, Face::Top)) => {
-                *self = Direction3D::TopEastBottomWest
-            }
-            (Direction3D::TopSouthBottomNorth, (Rotation::Counterclockwise, Face::South)) => {
-                *self = Direction3D::NorthWestSouthEast
-            }
-            (Direction3D::TopSouthBottomNorth, (Rotation::Counterclockwise, Face::Bottom)) => {
-                *self = Direction3D::TopWestBottomEast
-            }
-            (Direction3D::TopSouthBottomNorth, (Rotation::Counterclockwise, Face::North)) => {
-                *self = Direction3D::NorthEastSouthWest
-            }
+//             (Direction3D::TopSouthBottomNorth, (Rotation::Counterclockwise, Face::Top)) => {
+//                 *self = Direction3D::TopEastBottomWest
+//             }
+//             (Direction3D::TopSouthBottomNorth, (Rotation::Counterclockwise, Face::South)) => {
+//                 *self = Direction3D::NorthWestSouthEast
+//             }
+//             (Direction3D::TopSouthBottomNorth, (Rotation::Counterclockwise, Face::Bottom)) => {
+//                 *self = Direction3D::TopWestBottomEast
+//             }
+//             (Direction3D::TopSouthBottomNorth, (Rotation::Counterclockwise, Face::North)) => {
+//                 *self = Direction3D::NorthEastSouthWest
+//             }
 
-            (Direction3D::TopWestBottomEast, (Rotation::Clockwise, Face::Top)) => {
-                *self = Direction3D::TopNorthBottomSouth
-            }
-            (Direction3D::TopWestBottomEast, (Rotation::Clockwise, Face::West)) => {
-                *self = Direction3D::NorthEastSouthWest
-            }
-            (Direction3D::TopWestBottomEast, (Rotation::Clockwise, Face::Bottom)) => {
-                *self = Direction3D::TopSouthBottomNorth
-            }
-            (Direction3D::TopWestBottomEast, (Rotation::Clockwise, Face::East)) => {
-                *self = Direction3D::NorthWestSouthEast
-            }
+//             (Direction3D::TopWestBottomEast, (Rotation::Clockwise, Face::Top)) => {
+//                 *self = Direction3D::TopNorthBottomSouth
+//             }
+//             (Direction3D::TopWestBottomEast, (Rotation::Clockwise, Face::West)) => {
+//                 *self = Direction3D::NorthEastSouthWest
+//             }
+//             (Direction3D::TopWestBottomEast, (Rotation::Clockwise, Face::Bottom)) => {
+//                 *self = Direction3D::TopSouthBottomNorth
+//             }
+//             (Direction3D::TopWestBottomEast, (Rotation::Clockwise, Face::East)) => {
+//                 *self = Direction3D::NorthWestSouthEast
+//             }
 
-            (Direction3D::TopWestBottomEast, (Rotation::Counterclockwise, Face::Top)) => {
-                *self = Direction3D::TopSouthBottomNorth
-            }
-            (Direction3D::TopWestBottomEast, (Rotation::Counterclockwise, Face::West)) => {
-                *self = Direction3D::NorthWestSouthEast
-            }
-            (Direction3D::TopWestBottomEast, (Rotation::Counterclockwise, Face::Bottom)) => {
-                *self = Direction3D::TopNorthBottomSouth
-            }
-            (Direction3D::TopWestBottomEast, (Rotation::Counterclockwise, Face::East)) => {
-                *self = Direction3D::NorthEastSouthWest
-            }
+//             (Direction3D::TopWestBottomEast, (Rotation::Counterclockwise, Face::Top)) => {
+//                 *self = Direction3D::TopSouthBottomNorth
+//             }
+//             (Direction3D::TopWestBottomEast, (Rotation::Counterclockwise, Face::West)) => {
+//                 *self = Direction3D::NorthWestSouthEast
+//             }
+//             (Direction3D::TopWestBottomEast, (Rotation::Counterclockwise, Face::Bottom)) => {
+//                 *self = Direction3D::TopNorthBottomSouth
+//             }
+//             (Direction3D::TopWestBottomEast, (Rotation::Counterclockwise, Face::East)) => {
+//                 *self = Direction3D::NorthEastSouthWest
+//             }
 
-            (Direction3D::NorthEastSouthWest, (Rotation::Clockwise, Face::North)) => {
-                *self = Direction3D::TopSouthBottomNorth
-            }
-            (Direction3D::NorthEastSouthWest, (Rotation::Clockwise, Face::East)) => {
-                *self = Direction3D::TopWestBottomEast
-            }
-            (Direction3D::NorthEastSouthWest, (Rotation::Clockwise, Face::South)) => {
-                *self = Direction3D::TopNorthBottomSouth
-            }
-            (Direction3D::NorthEastSouthWest, (Rotation::Clockwise, Face::West)) => {
-                *self = Direction3D::TopEastBottomWest
-            }
+//             (Direction3D::NorthEastSouthWest, (Rotation::Clockwise, Face::North)) => {
+//                 *self = Direction3D::TopSouthBottomNorth
+//             }
+//             (Direction3D::NorthEastSouthWest, (Rotation::Clockwise, Face::East)) => {
+//                 *self = Direction3D::TopWestBottomEast
+//             }
+//             (Direction3D::NorthEastSouthWest, (Rotation::Clockwise, Face::South)) => {
+//                 *self = Direction3D::TopNorthBottomSouth
+//             }
+//             (Direction3D::NorthEastSouthWest, (Rotation::Clockwise, Face::West)) => {
+//                 *self = Direction3D::TopEastBottomWest
+//             }
 
-            (Direction3D::NorthEastSouthWest, (Rotation::Counterclockwise, Face::North)) => {
-                *self = Direction3D::TopNorthBottomSouth
-            }
-            (Direction3D::NorthEastSouthWest, (Rotation::Counterclockwise, Face::East)) => {
-                *self = Direction3D::TopEastBottomWest
-            }
-            (Direction3D::NorthEastSouthWest, (Rotation::Counterclockwise, Face::South)) => {
-                *self = Direction3D::TopSouthBottomNorth
-            }
-            (Direction3D::NorthEastSouthWest, (Rotation::Counterclockwise, Face::West)) => {
-                *self = Direction3D::TopWestBottomEast
-            }
+//             (Direction3D::NorthEastSouthWest, (Rotation::Counterclockwise, Face::North)) => {
+//                 *self = Direction3D::TopNorthBottomSouth
+//             }
+//             (Direction3D::NorthEastSouthWest, (Rotation::Counterclockwise, Face::East)) => {
+//                 *self = Direction3D::TopEastBottomWest
+//             }
+//             (Direction3D::NorthEastSouthWest, (Rotation::Counterclockwise, Face::South)) => {
+//                 *self = Direction3D::TopSouthBottomNorth
+//             }
+//             (Direction3D::NorthEastSouthWest, (Rotation::Counterclockwise, Face::West)) => {
+//                 *self = Direction3D::TopWestBottomEast
+//             }
 
-            (Direction3D::NorthWestSouthEast, (Rotation::Clockwise, Face::North)) => {
-                *self = Direction3D::TopNorthBottomSouth
-            }
-            (Direction3D::NorthWestSouthEast, (Rotation::Clockwise, Face::West)) => {
-                *self = Direction3D::TopWestBottomEast
-            }
-            (Direction3D::NorthWestSouthEast, (Rotation::Clockwise, Face::South)) => {
-                *self = Direction3D::TopSouthBottomNorth
-            }
-            (Direction3D::NorthWestSouthEast, (Rotation::Clockwise, Face::East)) => {
-                *self = Direction3D::TopEastBottomWest
-            }
+//             (Direction3D::NorthWestSouthEast, (Rotation::Clockwise, Face::North)) => {
+//                 *self = Direction3D::TopNorthBottomSouth
+//             }
+//             (Direction3D::NorthWestSouthEast, (Rotation::Clockwise, Face::West)) => {
+//                 *self = Direction3D::TopWestBottomEast
+//             }
+//             (Direction3D::NorthWestSouthEast, (Rotation::Clockwise, Face::South)) => {
+//                 *self = Direction3D::TopSouthBottomNorth
+//             }
+//             (Direction3D::NorthWestSouthEast, (Rotation::Clockwise, Face::East)) => {
+//                 *self = Direction3D::TopEastBottomWest
+//             }
 
-            (Direction3D::NorthWestSouthEast, (Rotation::Counterclockwise, Face::North)) => {
-                *self = Direction3D::TopSouthBottomNorth
-            }
-            (Direction3D::NorthWestSouthEast, (Rotation::Counterclockwise, Face::West)) => {
-                *self = Direction3D::TopEastBottomWest
-            }
-            (Direction3D::NorthWestSouthEast, (Rotation::Counterclockwise, Face::South)) => {
-                *self = Direction3D::TopNorthBottomSouth
-            }
-            (Direction3D::NorthWestSouthEast, (Rotation::Counterclockwise, Face::East)) => {
-                *self = Direction3D::TopWestBottomEast
-            }
+//             (Direction3D::NorthWestSouthEast, (Rotation::Counterclockwise, Face::North)) => {
+//                 *self = Direction3D::TopSouthBottomNorth
+//             }
+//             (Direction3D::NorthWestSouthEast, (Rotation::Counterclockwise, Face::West)) => {
+//                 *self = Direction3D::TopEastBottomWest
+//             }
+//             (Direction3D::NorthWestSouthEast, (Rotation::Counterclockwise, Face::South)) => {
+//                 *self = Direction3D::TopNorthBottomSouth
+//             }
+//             (Direction3D::NorthWestSouthEast, (Rotation::Counterclockwise, Face::East)) => {
+//                 *self = Direction3D::TopWestBottomEast
+//             }
 
-            _ => unreachable!(),
-        }
-    }
-}
+//             _ => unreachable!(),
+//         }
+//     }
+// }
 
-impl Cube {
-    fn get_iter(
-        &'_ self,
-        x: usize,
-        y: usize,
-        direction: Direction3D,
-    ) -> Box<dyn Iterator<Item = (Face, usize, usize, (Tile, usize, usize))> + '_> {
-        match direction {
-            Direction3D::TopSouthBottomNorth => Box::new(
-                self.top
-                    .iter()
-                    .enumerate()
-                    .map(move |(i, t)| (Face::Top, i, y, t[y]))
-                    .chain(
-                        self.south
-                            .iter()
-                            .enumerate()
-                            .map(move |(i, t)| (Face::South, i, y, t[y])),
-                    )
-                    .chain(
-                        self.bottom
-                            .iter()
-                            .enumerate()
-                            .map(move |(i, t)| (Face::Bottom, i, y, t[y])),
-                    )
-                    .chain(
-                        self.north
-                            .iter()
-                            .enumerate()
-                            .map(move |(i, t)| (Face::North, i, y, t[y])),
-                    )
-                    .cycle(),
-            )
-                as Box<dyn Iterator<Item = (Face, usize, usize, (Tile, usize, usize))>>,
-            Direction3D::TopEastBottomWest => Box::new(
-                self.top[y]
-                    .iter()
-                    .enumerate()
-                    .map(move |(i, t)| (Face::Top, x, i, *t))
-                    .chain(
-                        //become a column
-                        self.east
-                            .iter()
-                            .enumerate()
-                            .map(move |(i, t)| (Face::East, i, y, t[y])),
-                    )
-                    .chain(
-                        self.bottom[y]
-                            .iter()
-                            .enumerate()
-                            .rev()
-                            .map(move |(i, t)| (Face::Bottom, x, i, *t)),
-                    )
-                    .chain(
-                        //become a column
-                        self.west
-                            .iter()
-                            .enumerate()
-                            .rev()
-                            .map(move |(i, t)| (Face::West, i, y, t[y])),
-                    )
-                    .cycle(),
-            )
-                as Box<dyn Iterator<Item = (Face, usize, usize, (Tile, usize, usize))>>,
-            Direction3D::TopNorthBottomSouth => Box::new(
-                self.top
-                    .iter()
-                    .enumerate()
-                    .rev()
-                    .map(move |(i, t)| (Face::Top, i, y, t[y]))
-                    .chain(
-                        self.north
-                            .iter()
-                            .enumerate()
-                            .rev()
-                            .map(move |(i, t)| (Face::North, i, y, t[y])),
-                    )
-                    .chain(
-                        self.bottom
-                            .iter()
-                            .enumerate()
-                            .rev()
-                            .map(move |(i, t)| (Face::Bottom, i, y, t[y])),
-                    )
-                    .chain(
-                        self.south
-                            .iter()
-                            .enumerate()
-                            .rev()
-                            .map(move |(i, t)| (Face::South, i, y, t[y])),
-                    )
-                    .cycle(),
-            )
-                as Box<dyn Iterator<Item = (Face, usize, usize, (Tile, usize, usize))>>,
-            Direction3D::TopWestBottomEast => Box::new(
-                self.top[x]
-                    .iter()
-                    .enumerate()
-                    .rev()
-                    .map(move |(i, t)| (Face::Top, x, i, *t))
-                    .chain(
-                        //become a column
-                        self.west
-                            .iter()
-                            .enumerate()
-                            .rev()
-                            .map(move |(i, t)| (Face::West, i, y, t[x])),
-                    )
-                    .chain(
-                        self.bottom[x]
-                            .iter()
-                            .enumerate()
-                            .rev()
-                            .map(move |(i, t)| (Face::Bottom, x, i, *t)),
-                    )
-                    .chain(
-                        //become a column
-                        self.east
-                            .iter()
-                            .enumerate()
-                            .rev()
-                            .map(move |(i, t)| (Face::East, i, y, t[x])),
-                    )
-                    .cycle(),
-            )
-                as Box<dyn Iterator<Item = (Face, usize, usize, (Tile, usize, usize))>>,
-            Direction3D::NorthEastSouthWest => Box::new(
-                self.north[x]
-                    .iter()
-                    .enumerate()
-                    .rev()
-                    .map(move |(i, t)| (Face::North, x, i, *t))
-                    .chain(
-                        self.east[x]
-                            .iter()
-                            .enumerate()
-                            .rev()
-                            .map(move |(i, t)| (Face::East, x, i, *t)),
-                    )
-                    .chain(
-                        self.south[x]
-                            .iter()
-                            .enumerate()
-                            .rev()
-                            .map(move |(i, t)| (Face::South, x, i, *t)),
-                    )
-                    .chain(
-                        self.west[x]
-                            .iter()
-                            .enumerate()
-                            .rev()
-                            .map(move |(i, t)| (Face::West, x, i, *t)),
-                    )
-                    .cycle(),
-            )
-                as Box<dyn Iterator<Item = (Face, usize, usize, (Tile, usize, usize))>>,
-            Direction3D::NorthWestSouthEast => Box::new(
-                self.north[x]
-                    .iter()
-                    .enumerate()
-                    .map(move |(i, t)| (Face::North, x, i, *t))
-                    .chain(
-                        self.west[x]
-                            .iter()
-                            .enumerate()
-                            .map(move |(i, t)| (Face::West, x, i, *t)),
-                    )
-                    .chain(
-                        self.south[x]
-                            .iter()
-                            .enumerate()
-                            .map(move |(i, t)| (Face::South, x, i, *t)),
-                    )
-                    .chain(
-                        self.east[x]
-                            .iter()
-                            .enumerate()
-                            .map(move |(i, t)| (Face::East, x, i, *t)),
-                    )
-                    .cycle(),
-            )
-                as Box<dyn Iterator<Item = (Face, usize, usize, (Tile, usize, usize))>>,
-        }
-    }
-}
+// impl Cube {
+//     fn get_iter(
+//         &'_ self,
+//         x: usize,
+//         y: usize,
+//         direction: Direction3D,
+//     ) -> Box<dyn Iterator<Item = (Face, usize, usize, (Tile, usize, usize))> + '_> {
+//         match direction {
+//             Direction3D::TopSouthBottomNorth => Box::new(
+//                 self.top
+//                     .iter()
+//                     .enumerate()
+//                     .map(move |(i, t)| (Face::Top, i, y, t[y]))
+//                     .chain(
+//                         self.south
+//                             .iter()
+//                             .enumerate()
+//                             .map(move |(i, t)| (Face::South, i, y, t[y])),
+//                     )
+//                     .chain(
+//                         self.bottom
+//                             .iter()
+//                             .enumerate()
+//                             .map(move |(i, t)| (Face::Bottom, i, y, t[y])),
+//                     )
+//                     .chain(
+//                         self.north
+//                             .iter()
+//                             .enumerate()
+//                             .map(move |(i, t)| (Face::North, i, y, t[y])),
+//                     )
+//                     .cycle(),
+//             )
+//                 as Box<dyn Iterator<Item = (Face, usize, usize, (Tile, usize, usize))>>,
+//             Direction3D::TopEastBottomWest => Box::new(
+//                 self.top[y]
+//                     .iter()
+//                     .enumerate()
+//                     .map(move |(i, t)| (Face::Top, x, i, *t))
+//                     .chain(
+//                         //become a column
+//                         self.east
+//                             .iter()
+//                             .enumerate()
+//                             .map(move |(i, t)| (Face::East, i, y, t[y])),
+//                     )
+//                     .chain(
+//                         self.bottom[y]
+//                             .iter()
+//                             .enumerate()
+//                             .rev()
+//                             .map(move |(i, t)| (Face::Bottom, x, i, *t)),
+//                     )
+//                     .chain(
+//                         //become a column
+//                         self.west
+//                             .iter()
+//                             .enumerate()
+//                             .rev()
+//                             .map(move |(i, t)| (Face::West, i, y, t[y])),
+//                     )
+//                     .cycle(),
+//             )
+//                 as Box<dyn Iterator<Item = (Face, usize, usize, (Tile, usize, usize))>>,
+//             Direction3D::TopNorthBottomSouth => Box::new(
+//                 self.top
+//                     .iter()
+//                     .enumerate()
+//                     .rev()
+//                     .map(move |(i, t)| (Face::Top, i, y, t[y]))
+//                     .chain(
+//                         self.north
+//                             .iter()
+//                             .enumerate()
+//                             .rev()
+//                             .map(move |(i, t)| (Face::North, i, y, t[y])),
+//                     )
+//                     .chain(
+//                         self.bottom
+//                             .iter()
+//                             .enumerate()
+//                             .rev()
+//                             .map(move |(i, t)| (Face::Bottom, i, y, t[y])),
+//                     )
+//                     .chain(
+//                         self.south
+//                             .iter()
+//                             .enumerate()
+//                             .rev()
+//                             .map(move |(i, t)| (Face::South, i, y, t[y])),
+//                     )
+//                     .cycle(),
+//             )
+//                 as Box<dyn Iterator<Item = (Face, usize, usize, (Tile, usize, usize))>>,
+//             Direction3D::TopWestBottomEast => Box::new(
+//                 self.top[x]
+//                     .iter()
+//                     .enumerate()
+//                     .rev()
+//                     .map(move |(i, t)| (Face::Top, x, i, *t))
+//                     .chain(
+//                         //become a column
+//                         self.west
+//                             .iter()
+//                             .enumerate()
+//                             .rev()
+//                             .map(move |(i, t)| (Face::West, i, y, t[x])),
+//                     )
+//                     .chain(
+//                         self.bottom[x]
+//                             .iter()
+//                             .enumerate()
+//                             .rev()
+//                             .map(move |(i, t)| (Face::Bottom, x, i, *t)),
+//                     )
+//                     .chain(
+//                         //become a column
+//                         self.east
+//                             .iter()
+//                             .enumerate()
+//                             .rev()
+//                             .map(move |(i, t)| (Face::East, i, y, t[x])),
+//                     )
+//                     .cycle(),
+//             )
+//                 as Box<dyn Iterator<Item = (Face, usize, usize, (Tile, usize, usize))>>,
+//             Direction3D::NorthEastSouthWest => Box::new(
+//                 self.north[x]
+//                     .iter()
+//                     .enumerate()
+//                     .rev()
+//                     .map(move |(i, t)| (Face::North, x, i, *t))
+//                     .chain(
+//                         self.east[x]
+//                             .iter()
+//                             .enumerate()
+//                             .rev()
+//                             .map(move |(i, t)| (Face::East, x, i, *t)),
+//                     )
+//                     .chain(
+//                         self.south[x]
+//                             .iter()
+//                             .enumerate()
+//                             .rev()
+//                             .map(move |(i, t)| (Face::South, x, i, *t)),
+//                     )
+//                     .chain(
+//                         self.west[x]
+//                             .iter()
+//                             .enumerate()
+//                             .rev()
+//                             .map(move |(i, t)| (Face::West, x, i, *t)),
+//                     )
+//                     .cycle(),
+//             )
+//                 as Box<dyn Iterator<Item = (Face, usize, usize, (Tile, usize, usize))>>,
+//             Direction3D::NorthWestSouthEast => Box::new(
+//                 self.north[x]
+//                     .iter()
+//                     .enumerate()
+//                     .map(move |(i, t)| (Face::North, x, i, *t))
+//                     .chain(
+//                         self.west[x]
+//                             .iter()
+//                             .enumerate()
+//                             .map(move |(i, t)| (Face::West, x, i, *t)),
+//                     )
+//                     .chain(
+//                         self.south[x]
+//                             .iter()
+//                             .enumerate()
+//                             .map(move |(i, t)| (Face::South, x, i, *t)),
+//                     )
+//                     .chain(
+//                         self.east[x]
+//                             .iter()
+//                             .enumerate()
+//                             .map(move |(i, t)| (Face::East, x, i, *t)),
+//                     )
+//                     .cycle(),
+//             )
+//                 as Box<dyn Iterator<Item = (Face, usize, usize, (Tile, usize, usize))>>,
+//         }
+//     }
+// }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 enum Face {
@@ -592,25 +592,23 @@ enum Face {
 
 fn cube(cube: &Cube, moves: &[Move]) -> usize {
     let mut direction = Direction::default();
-    let mut direction3d = Direction3D::default();
+    // let mut direction3d = Direction3D::default();
     let mut position = (0, 0, Face::Top);
     for m in moves {
         match m {
             Move::Direction(n) => {
-                println!("{position:?} {n} {direction:?} {direction3d:?}");
                 let (x, y, face) = position;
-                let (new_face, new_x, new_y) = cube
-                    .get_iter(x, y, direction3d)
-                    .skip_while(|(f, nx, ny, _)| *f != face || *nx != x || *ny != y)
+                match (face, direction) {
+                    (Face::Top, Direction::Down) => cube.top.iter()
+                    .enumerate()
+                    .skip_while(|(nx, _)| *nx != x)
                     .skip(1)
                     .take(*n)
-                    .take_while(|(_, _, _, (t, _, _))| !t.is_wall())
+                    .take_while(|(_, row)| !row[y].is_wall())
                     .last()
-                    .map(|(f, x, y, _)| (f, x, y))
-                    .unwrap_or((face, x, y));
-                position.0 = new_x;
-                position.1 = new_y;
-                position.2 = new_face;
+                    .map(|(x, _)| x)
+                    .unwrap_or(x);
+                }
             }
             Move::Rotation(r) => {
                 direction += *r;
