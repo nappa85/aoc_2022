@@ -224,6 +224,32 @@ enum Direction3D {
     NorthWestSouthEast,
 }
 
+impl Direction3D {
+    fn get_points(&self, face: Face) -> usize {
+        match (self, face) {
+            (Direction3D::TopNorthBottomSouth, Face::Top) => Direction::Up.get_points(),
+            (Direction3D::TopNorthBottomSouth, Face::North) => Direction::Down.get_points(),
+            (Direction3D::TopNorthBottomSouth, Face::Bottom) => Direction::Up.get_points(),
+            (Direction3D::TopNorthBottomSouth, Face::South) => Direction::Up.get_points(),
+            (Direction3D::TopSouthBottomNorth, Face::Top) => Direction::Down.get_points(),
+            (Direction3D::TopSouthBottomNorth, Face::South) => Direction::Down.get_points(),
+            (Direction3D::TopSouthBottomNorth, Face::Bottom) => Direction::Down.get_points(),
+            (Direction3D::TopSouthBottomNorth, Face::North) => Direction::Up.get_points(),
+            (Direction3D::TopEastBottomWest, Face::Top) => Direction::Right.get_points(),
+            (Direction3D::TopEastBottomWest, Face::East) => Direction::Down.get_points(),
+            (Direction3D::TopEastBottomWest, Face::Bottom) => Direction::Left.get_points(),
+            (Direction3D::TopEastBottomWest, Face::West) => Direction::Up.get_points(),
+            (Direction3D::TopWestBottomEast, Face::Top) => Direction::Left.get_points(),
+            (Direction3D::TopWestBottomEast, Face::West) => Direction::Down.get_points(),
+            (Direction3D::TopWestBottomEast, Face::Bottom) => Direction::Right.get_points(),
+            (Direction3D::TopWestBottomEast, Face::East) => Direction::Up.get_points(),
+            (Direction3D::NorthEastSouthWest, _) => Direction::Left.get_points(),
+            (Direction3D::NorthWestSouthEast, _) => Direction::Right.get_points(),
+            _ => unreachable!(),
+        }
+    }
+}
+
 impl Default for Direction3D {
     fn default() -> Self {
         Direction3D::TopEastBottomWest
@@ -404,7 +430,7 @@ impl Cube {
     ) -> Box<dyn Iterator<Item = (Face, usize, usize, (Tile, usize, usize))> + '_> {
         match direction {
             Direction3D::TopSouthBottomNorth => Box::new({
-                let (y1, y2) = match face {
+                let (j1, j2) = match face {
                     Face::Top => (y, self.north[x].len() - (y + 1)),
                     Face::South => (y, self.north[x].len() - (y + 1)),
                     Face::Bottom => (y, self.north[x].len() - (y + 1)),
@@ -414,25 +440,25 @@ impl Cube {
                 self.top
                     .iter()
                     .enumerate()
-                    .map(move |(i, t)| (Face::Top, i, y1, t[y1]))
+                    .map(move |(i, t)| (Face::Top, i, j1, t[j1]))
                     .chain(
                         self.south
                             .iter()
                             .enumerate()
-                            .map(move |(i, t)| (Face::South, i, y1, t[y1])),
+                            .map(move |(i, t)| (Face::South, i, j1, t[j1])),
                     )
                     .chain(
                         self.bottom
                             .iter()
                             .enumerate()
-                            .map(move |(i, t)| (Face::Bottom, i, y1, t[y1])),
+                            .map(move |(i, t)| (Face::Bottom, i, j1, t[j1])),
                     )
                     .chain(
                         self.north
                             .iter()
                             .enumerate()
                             .rev()
-                            .map(move |(i, t)| (Face::North, i, y2, t[y2])),
+                            .map(move |(i, t)| (Face::North, i, j2, t[j2])),
                     )
                     .cycle()
             })
@@ -454,7 +480,7 @@ impl Cube {
                         self.east
                             .iter()
                             .enumerate()
-                            .map(move |(i, t)| (Face::East, i, y, t[j2])),
+                            .map(move |(i, t)| (Face::East, i, j2, t[j2])),
                     )
                     .chain(
                         self.bottom[j2]
@@ -469,43 +495,43 @@ impl Cube {
                             .iter()
                             .enumerate()
                             .rev()
-                            .map(move |(i, t)| (Face::West, i, y, t[j2])),
+                            .map(move |(i, t)| (Face::West, i, j1, t[j1])),
                     )
                     .cycle()
             })
                 as Box<dyn Iterator<Item = (Face, usize, usize, (Tile, usize, usize))>>,
             Direction3D::TopNorthBottomSouth => Box::new({
-                // let (y1, y2) = match face {
-                //     Face::North => (y, self.north[x].len() - (y + 1)),
-                //     Face::Bottom => (self.north[x].len() - (y + 1), y),
-                //     Face::East => (self.north[x].len() - (y + 1), y),
-                //     Face::West => (y, self.north[x].len() - (y + 1)),
-                //     _ => unreachable!(),
-                // };
+                let (j1, j2) = match face {
+                    Face::Top => (y, self.north[x].len() - (y + 1)),
+                    Face::South => (y, self.north[x].len() - (y + 1)),
+                    Face::Bottom => (y, self.north[x].len() - (y + 1)),
+                    Face::North => (self.north[x].len() - (y + 1), y),
+                    _ => unreachable!(),
+                };
                 self.top
                     .iter()
                     .enumerate()
                     .rev()
-                    .map(move |(i, t)| (Face::Top, i, y, t[y]))
+                    .map(move |(i, t)| (Face::Top, i, j1, t[j1]))
                     .chain(
                         self.north
                             .iter()
                             .enumerate()
-                            .map(move |(i, t)| (Face::North, i, y, t[y])),
+                            .map(move |(i, t)| (Face::North, i, j2, t[j2])),
                     )
                     .chain(
                         self.bottom
                             .iter()
                             .enumerate()
                             .rev()
-                            .map(move |(i, t)| (Face::Bottom, i, y, t[y])),
+                            .map(move |(i, t)| (Face::Bottom, i, j1, t[j1])),
                     )
                     .chain(
                         self.south
                             .iter()
                             .enumerate()
                             .rev()
-                            .map(move |(i, t)| (Face::South, i, y, t[y])),
+                            .map(move |(i, t)| (Face::South, i, j1, t[j1])),
                     )
                     .cycle()
             })
@@ -528,7 +554,7 @@ impl Cube {
                         self.west
                             .iter()
                             .enumerate()
-                            .map(move |(i, t)| (Face::West, i, y, t[j2])),
+                            .map(move |(i, t)| (Face::West, i, j2, t[j2])),
                     )
                     .chain(
                         self.bottom[j2]
@@ -542,77 +568,77 @@ impl Cube {
                             .iter()
                             .enumerate()
                             .rev()
-                            .map(move |(i, t)| (Face::East, i, y, t[j1])),
+                            .map(move |(i, t)| (Face::East, i, j1, t[j1])),
                     )
                     .cycle()
             })
                 as Box<dyn Iterator<Item = (Face, usize, usize, (Tile, usize, usize))>>,
             Direction3D::NorthEastSouthWest => Box::new({
-                let (x1, x2) = match face {
+                let (j1, j2) = match face {
                     Face::North => (x, self.north.len() - (x + 1)),
                     Face::South => (self.north.len() - (x + 1), x),
                     Face::East => (self.north.len() - (x + 1), x),
                     Face::West => (x, self.north.len() - (x + 1)),
                     _ => unreachable!(),
                 };
-                self.north[x1]
+                self.north[j1]
                     .iter()
                     .enumerate()
                     .rev()
-                    .map(move |(i, t)| (Face::North, x, i, *t))
+                    .map(move |(i, t)| (Face::North, j1, i, *t))
                     .chain(
-                        self.east[x2]
+                        self.east[j2]
                             .iter()
                             .enumerate()
                             .rev()
-                            .map(move |(i, t)| (Face::East, x, i, *t)),
+                            .map(move |(i, t)| (Face::East, j2, i, *t)),
                     )
                     .chain(
-                        self.south[x2]
+                        self.south[j2]
                             .iter()
                             .enumerate()
                             .rev()
-                            .map(move |(i, t)| (Face::South, x, i, *t)),
+                            .map(move |(i, t)| (Face::South, j2, i, *t)),
                     )
                     .chain(
-                        self.west[x1]
+                        self.west[j1]
                             .iter()
                             .enumerate()
                             .rev()
-                            .map(move |(i, t)| (Face::West, x, i, *t)),
+                            .map(move |(i, t)| (Face::West, j1, i, *t)),
                     )
                     .cycle()
             })
                 as Box<dyn Iterator<Item = (Face, usize, usize, (Tile, usize, usize))>>,
             Direction3D::NorthWestSouthEast => Box::new({
-                let (x1, x2) = match face {
+                let (j1, j2) = match face {
                     Face::North => (x, self.north.len() - (x + 1)),
                     Face::South => (self.north.len() - (x + 1), x),
                     Face::East => (self.north.len() - (x + 1), x),
                     Face::West => (x, self.north.len() - (x + 1)),
                     _ => unreachable!(),
                 };
-                self.north[x1]
+                self.north[j1]
                     .iter()
                     .enumerate()
-                    .map(move |(i, t)| (Face::North, x, i, *t))
+                    .map(move |(i, t)| (Face::North, j1, i, *t))
                     .chain(
-                        self.west[x1]
+                        self.west[j1]
                             .iter()
                             .enumerate()
-                            .map(move |(i, t)| (Face::West, x, i, *t)),
+                            .map(move |(i, t)| (Face::West, j1, i, *t)),
                     )
                     .chain(
-                        self.south[x2]
+                        self.south[j2]
                             .iter()
                             .enumerate()
-                            .map(move |(i, t)| (Face::South, x, i, *t)),
+                            .map(move |(i, t)| (Face::South, j2, i, *t)),
                     )
                     .chain(
-                        self.east[x2]
+                        self.east[j2]
                             .iter()
                             .enumerate()
-                            .map(move |(i, t)| (Face::East, x, i, *t)),
+                            .map(move |(i, t)| (Face::East, j2, i, *t)),
                     )
                     .cycle()
             })
@@ -632,13 +658,12 @@ enum Face {
 }
 
 fn cube(cube: &Cube, moves: &[Move]) -> usize {
-    let mut direction = Direction::default();
     let mut direction3d = Direction3D::default();
     let mut position = (0, 0, Face::Top);
     for m in moves {
         match m {
             Move::Direction(n) => {
-                println!("{position:?} {n} {direction:?} {direction3d:?}");
+                println!("{position:?} {n} {direction3d:?}");
                 let (x, y, face) = position;
                 let (new_face, new_x, new_y) = cube
                     .get_iter(x, y, direction3d, face)
@@ -654,20 +679,19 @@ fn cube(cube: &Cube, moves: &[Move]) -> usize {
                 position.2 = new_face;
             }
             Move::Rotation(r) => {
-                direction += *r;
                 direction3d += (*r, position.2);
             }
         }
     }
-    println!("{position:?} {direction:?} {direction3d:?}");
+    println!("{position:?} {direction3d:?}");
     let (x, y, face) = position;
     let temp = cube
         .get_iter(x, y, direction3d, face)
         .find(|(f, nx, ny, _)| *f == face && *nx == x && *ny == y)
         .unwrap();
-    println!("{temp:?} {direction:?}");
+    println!("{temp:?}");
     let cell = temp.3;
-    1000 * (cell.1 + 1) + 4 * (cell.2 + 1) + direction.get_points()
+    1000 * (cell.1 + 1) + 4 * (cell.2 + 1) + direction3d.get_points(face)
 }
 
 fn main() {
@@ -801,20 +825,20 @@ mod tests {
                 .collect::<Vec<_>>(),
         };
 
-        cube_map
-            .get_iter(
-                2,
-                2,
-                super::Direction3D::TopSouthBottomNorth,
-                super::Face::Bottom,
-            )
-            .skip_while(|(f, nx, ny, _)| *f != super::Face::Bottom || *nx != 2 || *ny != 2)
-            .take(10)
-            .for_each(|(_, _, _, (t, _, _))| match t {
-                super::Tile::None => print!(" "),
-                super::Tile::Open => print!("."),
-                super::Tile::Wall => print!("#"),
-            });
+        // cube_map
+        //     .get_iter(
+        //         2,
+        //         2,
+        //         super::Direction3D::TopSouthBottomNorth,
+        //         super::Face::Bottom,
+        //     )
+        //     .skip_while(|(f, nx, ny, _)| *f != super::Face::Bottom || *nx != 2 || *ny != 2)
+        //     .take(10)
+        //     .for_each(|(_, _, _, (t, _, _))| match t {
+        //         super::Tile::None => print!(" "),
+        //         super::Tile::Open => print!("."),
+        //         super::Tile::Wall => print!("#"),
+        //     });
         assert_eq!(super::cube(&cube_map, &moves), 5031);
     }
 }
