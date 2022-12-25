@@ -26,3 +26,4 @@
 | 22 | Solved only first part... |
 | 23 | Bare minimum... |
 | 24 | Bare minimum... |
+| 25 | Bare minimum... |

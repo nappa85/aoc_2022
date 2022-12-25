@@ -720,12 +720,13 @@ fn main() {
             .collect::<Vec<_>>(),
         // must be rotated 90°
         east: ((step_y * 2)..(step_y * 3))
-            .map(|y| (0..step_x).map(move |x| (map[x][y], x, y)).collect())
+            .map(|y| (0..step_x).rev().map(move |x| (map[x][y], x, y)).collect())
             .collect::<Vec<_>>(),
         // must be rotated 90°
         west: (0..step_y)
             .map(|y| {
                 ((step_x * 2)..(step_x * 3))
+                    .rev()
                     .map(move |x| (map[x][y], x, y))
                     .collect()
             })
@@ -741,6 +742,7 @@ fn main() {
         north: (0..step_y)
             .map(|y| {
                 ((step_x * 3)..(step_x * 4))
+                    .rev()
                     .map(move |x| (map[x][y], x, y))
                     .collect()
             })
@@ -811,5 +813,68 @@ mod tests {
         };
 
         assert_eq!(super::cube(&cube_map, &moves), 5031);
+    }
+
+    #[test]
+    fn temp() {
+        let input = include_str!("../input");
+        let (map, moves) = super::parse(input);
+        let step_x = map.len() / 4;
+        let step_y = map.iter().map(|row| row.len()).max().unwrap() / 3;
+        let map = &map;
+        let cube_map = super::Cube {
+            top: (0..step_x)
+                .map(|x| {
+                    (step_y..(step_y * 2))
+                        .map(move |y| (map[x][y], x, y))
+                        .collect()
+                })
+                .collect::<Vec<_>>(),
+            south: (step_x..(step_x * 2))
+                .map(|x| {
+                    (step_y..(step_y * 2))
+                        .map(move |y| (map[x][y], x, y))
+                        .collect()
+                })
+                .collect::<Vec<_>>(),
+            // must be rotated 90°
+            east: ((step_y * 2)..(step_y * 3))
+                .map(|y| (0..step_x).map(move |x| (map[x][y], x, y)).collect())
+                .collect::<Vec<_>>(),
+            // must be rotated 90°
+            west: (0..step_y)
+                .map(|y| {
+                    ((step_x * 2)..(step_x * 3))
+                        .rev()
+                        .map(move |x| (map[x][y], x, y))
+                        .collect()
+                })
+                .collect::<Vec<_>>(),
+            bottom: ((step_x * 2)..(step_x * 3))
+                .map(|x| {
+                    (step_y..(step_y * 2))
+                        .map(move |y| (map[x][y], x, y))
+                        .collect()
+                })
+                .collect::<Vec<_>>(),
+            // must be rotated 90°
+            north: (0..step_y)
+                .map(|y| {
+                    ((step_x * 3)..(step_x * 4))
+                        .rev()
+                        .map(move |x| (map[x][y], x, y))
+                        .collect()
+                })
+                .collect::<Vec<_>>(),
+        };
+
+        cube_map.west.iter().for_each(|r| {
+            r.iter().for_each(|(t, _, _)| match t {
+                super::Tile::None => print!(" "),
+                super::Tile::Open => print!("."),
+                super::Tile::Wall => print!("#"),
+            });
+            println!("");
+        })
     }
 }
